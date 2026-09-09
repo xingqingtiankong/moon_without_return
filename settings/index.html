@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030506">
+    <link rel="icon" href="../img/favicon.svg">
+    <title>月尽时 | 设置</title>
+    <link rel="stylesheet" href="../shared/css/base.css">
+    <link rel="stylesheet" href="./css/settings.css">
+    <link rel="stylesheet" href="../shared/css/in-game-theme.css">
+    <script src="../shared/js/common.js" defer></script>
+    <script src="../shared/js/ui-motion.js" defer></script>
+    <script src="../shared/js/storage.js" defer></script>
+    <script src="./js/settings.js" defer></script>
+</head>
+<body>
+<main class="page-shell settings-shell">
+    <div class="scene-background" aria-hidden="true"></div>
+    <div class="ambient-layer" aria-hidden="true">
+        <span class="ambient-dust"></span>
+        <span class="scanlines"></span>
+        <span class="film-grain"></span>
+    </div>
+
+    <header class="inner-header">
+        <img class="game-mark" src="../img/logo.png" alt="Moon Without Return">
+        <h1 class="inner-title">设置</h1>
+        <p class="inner-subtitle">SETTINGS</p>
+    </header>
+
+    <section class="archive-panel settings-panel" aria-label="设置分类">
+        <article class="setting-category difficulty-category">
+            <header><span class="setting-category__index">00</span>
+                <div><h2>游戏难度</h2>
+                    <p>CHALLENGE</p></div>
+            </header>
+            <div class="difficulty-options" role="group" aria-label="游戏难度">
+                <button type="button" data-difficulty="easy"><strong>轻松</strong><small>小棋盘 · 少量目标 ·
+                    充足时间</small></button>
+                <button type="button" data-difficulty="normal"><strong>标准</strong><small>更多岔路 · 多目标 ·
+                    需要规划</small></button>
+                <button type="button" data-difficulty="hard"><strong>挑战</strong><small>复杂布局 · 更长序列 ·
+                    紧凑节奏</small></button>
+            </div>
+            <p>随时调整，下次小游戏生效。难度不改变剧情与线索。</p></article>
+        <article class="setting-category controls-category">
+            <header>
+                <span class="setting-category__index">01</span>
+                <div>
+                    <h2>控制</h2>
+                    <p>CONTROLS</p>
+                </div>
+            </header>
+            <div class="binding-groups" id="binding-groups"></div>
+            <div class="control-actions">
+                <button type="button" id="restore-defaults">恢复默认</button>
+                <p id="binding-feedback" role="status" aria-live="polite">点击键位后按下新键；Esc 取消。</p>
+            </div>
+        </article>
+
+        <article class="setting-category">
+            <header>
+                <span class="setting-category__index">02</span>
+                <div>
+                    <h2>音频</h2>
+                    <p>AUDIO</p>
+                </div>
+            </header>
+            <ul class="audio-placeholders" aria-label="待开放音频选项">
+                <li>主音量 <small>MASTER VOLUME</small></li>
+                <li>音乐 <small>MUSIC</small></li>
+                <li>音效 <small>SFX</small></li>
+            </ul>
+        </article>
+
+        <article class="setting-category">
+            <header>
+                <span class="setting-category__index">03</span>
+                <div>
+                    <h2>显示</h2>
+                    <p>DISPLAY</p>
+                </div>
+            </header>
+            <p class="setting-category__status">显示选项 // CONFIGURATION PENDING</p>
+        </article>
+
+        <p class="settings-pending">键位设置实时保存；音频与显示选项将在后续章节开放。</p>
+    </section>
+
+    <button class="back-control" id="back-button" type="button">
+        <span>返回</span>
+        <small>BACK</small>
+    </button>
+
+    <aside aria-label="系统状态">
+        <p class="corner-hud corner-hud--top-right">
+            <span class="corner-hud__label">SYSTEM TIME</span>
+            <time class="corner-hud__value" id="system-time" datetime="00:00:00">00:00:00</time>
+        </p>
+        <p class="corner-hud corner-hud--bottom-right">
+            <span class="corner-hud__label">SYSTEM CONFIG</span>
+            <span class="corner-hud__value">READ ONLY</span>
+        </p>
+    </aside>
+</main>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#172033" flood-opacity=".08"/></filter>
+    <style>
+      .cn{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#172033}.mono{font-family:Consolas,"Cascadia Mono",monospace;fill:#172033}.title{font-size:48px;font-weight:700}.sub{font-size:25px;fill:#647084}.folder{font-size:27px;font-weight:700}.desc{font-size:19px;fill:#536074}.group{font-size:25px;font-weight:700}.file{font-size:22px}.line{stroke:#69778b;stroke-width:3;fill:none}.blue{stroke:#288eea}.card{fill:#fff;stroke:#cbd3dd;stroke-width:2}.small{font-size:18px;fill:#718096}
+    </style>
+  </defs>
+  <rect width="1920" height="1080" fill="#f8fafc"/>
+  <text x="960" y="65" text-anchor="middle" class="cn title">moon_without_return｜项目文件夹结构</text>
+  <text x="960" y="105" text-anchor="middle" class="cn sub">核心目录与 game/js/ 关键模块</text>
+
+  <g filter="url(#shadow)"><rect x="680" y="135" width="560" height="82" rx="15" class="card"/><path d="M715 166h28l9 9h47v28h-84z" fill="#9aa8b8"/><text x="825" y="187" class="mono folder">moon_without_return/</text></g>
+  <path d="M960 217v34M100 251h1720M100 251v38M292 251v38M484 251v38M676 251v38M868 251v38M1060 251v38M1252 251v38M1444 251v38M1636 251v38M1820 251v38" class="line"/>
+
+  <g filter="url(#shadow)">
+    <rect x="25" y="289" width="150" height="145" rx="14" class="card"/><path d="M48 311h25l8 8h38v26H48z" fill="#a9b4c1"/><text x="48" y="376" class="mono folder">login/</text><text x="48" y="409" class="cn desc">登录注册</text>
+    <rect x="217" y="289" width="150" height="145" rx="14" class="card"/><path d="M240 311h25l8 8h38v26h-71z" fill="#a9b4c1"/><text x="240" y="376" class="mono folder">main/</text><text x="240" y="409" class="cn desc">主菜单</text>
+    <rect x="409" y="280" width="150" height="163" rx="14" fill="#edf6ff" stroke="#288eea" stroke-width="3"/><path d="M432 306h25l8 8h38v26h-71z" fill="#3c9cf1"/><text x="432" y="371" class="mono folder">game/</text><text x="432" y="404" class="cn desc">地图、剧情</text><text x="432" y="430" class="cn desc">和小游戏</text>
+    <rect x="601" y="289" width="150" height="145" rx="14" class="card"/><path d="M624 311h25l8 8h38v26h-71z" fill="#a9b4c1"/><text x="624" y="376" class="mono folder">save/</text><text x="624" y="409" class="cn desc">存档管理</text>
+    <rect x="793" y="289" width="150" height="145" rx="14" class="card"/><path d="M816 311h25l8 8h38v26h-71z" fill="#a9b4c1"/><text x="816" y="376" class="mono folder" font-size="24">settings/</text><text x="816" y="409" class="cn desc">设置与按键</text>
+    <rect x="985" y="289" width="150" height="145" rx="14" class="card"/><path d="M1008 311h25l8 8h38v26h-71z" fill="#a9b4c1"/><text x="1008" y="376" class="mono" font-size="21" font-weight="700">achievement/</text><text x="1008" y="409" class="cn desc">成就</text>
+    <rect x="1177" y="289" width="150" height="145" rx="14" class="card"/><path d="M1200 311h25l8 8h38v26h-71z" fill="#a9b4c1"/><text x="1200" y="376" class="mono folder">about/</text><text x="1200" y="409" class="cn desc">项目介绍</text>
+    <rect x="1369" y="289" width="150" height="145" rx="14" class="card"/><path d="M1392 311h25l8 8h38v26h-71z" fill="#a9b4c1"/><text x="1392" y="376" class="mono folder">shared/</text><text x="1392" y="409" class="cn desc">公共样式</text><text x="1392" y="430" class="cn desc">和功能</text>
+    <rect x="1561" y="289" width="150" height="145" rx="14" class="card"/><path d="M1584 311h25l8 8h38v26h-71z" fill="#a9b4c1"/><text x="1584" y="376" class="mono folder">img/</text><text x="1584" y="409" class="cn desc">图片与地图资源</text>
+  </g>
+
+  <path d="M484 443v47" class="line blue"/>
+  <g filter="url(#shadow)"><rect x="350" y="490" width="1220" height="515" rx="22" fill="#fff" stroke="#288eea" stroke-width="3"/></g>
+  <rect x="350" y="490" width="1220" height="82" rx="22" fill="#eef7ff"/><path d="M390 516h34l10 10h52v32h-96z" fill="#3c9cf1"/><text x="520" y="545" class="mono" font-size="31" font-weight="700">game/js/</text><text x="700" y="545" class="cn" font-size="31" font-weight="700">四组核心文件</text>
+
+  <g>
+    <rect x="390" y="605" width="535" height="165" rx="16" fill="#f2f8ff" stroke="#59a9ef" stroke-width="2"/><rect x="390" y="605" width="535" height="50" rx="16" fill="#ddecff"/><text x="430" y="638" class="cn group">剧情状态</text><text x="430" y="698" class="mono file">story.js</text><text x="430" y="738" class="cn desc">剧情状态机</text>
+    <rect x="995" y="605" width="535" height="165" rx="16" fill="#f0fbfa" stroke="#3cbcaf" stroke-width="2"/><rect x="995" y="605" width="535" height="50" rx="16" fill="#d9f4f1"/><text x="1035" y="638" class="cn group">剧情节点</text><text x="1035" y="692" class="mono file">campaign.js</text><text x="1245" y="692" class="mono file">chapters*.js</text><text x="1035" y="738" class="cn desc">章节流程与剧情节点</text>
+    <rect x="390" y="805" width="535" height="165" rx="16" fill="#fff9ed" stroke="#e3a22f" stroke-width="2"/><rect x="390" y="805" width="535" height="50" rx="16" fill="#fff0c9"/><text x="430" y="838" class="cn group">小游戏</text><text x="430" y="892" class="mono file">puzzles.js</text><text x="630" y="892" class="mono file">*-games.js</text><text x="430" y="938" class="cn desc">谜题与小游戏逻辑</text>
+    <rect x="995" y="805" width="535" height="165" rx="16" fill="#f7f3ff" stroke="#9a74e8" stroke-width="2"/><rect x="995" y="805" width="535" height="50" rx="16" fill="#ece3ff"/><text x="1035" y="838" class="cn group">地图交互</text><text x="1035" y="892" class="mono file">config.js</text><text x="1220" y="892" class="mono file">game.js</text><text x="1035" y="938" class="cn desc">地图配置、角色移动与场景交互</text>
+  </g>
+  <text x="1830" y="1045" text-anchor="end" class="cn small">仅展示核心目录</text>
+</svg>

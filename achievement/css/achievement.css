@@ -1,0 +1,148 @@
+.achievement-shell .scene-background {
+    filter: brightness(0.39) saturate(0.58) contrast(1.12);
+}
+
+.achievement-panel {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    min-height: clamp(17rem, 35vh, 25rem);
+    text-align: center;
+}
+
+.empty-node {
+    position: relative;
+    width: clamp(2.5rem, 3.3vw, 3.8rem);
+    aspect-ratio: 1;
+    margin-bottom: clamp(0.8rem, 1.4vw, 1.3rem);
+    border: 1px solid rgba(141, 187, 190, 0.22);
+    border-radius: 50%;
+}
+
+.empty-node::before,
+.empty-node::after,
+.empty-node span {
+    position: absolute;
+    content: "";
+}
+
+.empty-node::before {
+    inset: 24%;
+    border: 1px dotted rgba(153, 197, 199, 0.26);
+    border-radius: 50%;
+}
+
+.empty-node::after {
+    top: 50%;
+    right: -58%;
+    left: -58%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(148, 194, 196, 0.22), transparent);
+}
+
+.empty-node span {
+    top: 50%;
+    left: 50%;
+    width: 0.22rem;
+    height: 0.22rem;
+    border-radius: 50%;
+    background: rgba(169, 210, 211, 0.42);
+    transform: translate(-50%, -50%);
+}
+
+.empty-code,
+.empty-subtitle,
+.achievement-panel h2 {
+    margin: 0;
+}
+
+.empty-code {
+    color: rgba(142, 178, 179, 0.36);
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    font-size: clamp(0.42rem, 0.48vw, 0.58rem);
+    letter-spacing: clamp(0.13rem, 0.24vw, 0.28rem);
+}
+
+.achievement-panel h2 {
+    margin-top: 0.7rem;
+    color: rgba(201, 216, 214, 0.72);
+    font-size: clamp(0.86rem, 1vw, 1.18rem);
+    font-weight: 400;
+    letter-spacing: 0.28rem;
+    text-indent: 0.28rem;
+}
+
+.empty-subtitle {
+    margin-top: 0.35rem;
+    color: rgba(143, 169, 169, 0.38);
+    font-size: clamp(0.44rem, 0.5vw, 0.6rem);
+    letter-spacing: 0.2rem;
+}
+
+.achievement-slots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(0.5rem, 1vw, 0.9rem);
+    width: min(76%, 32rem);
+    margin-top: clamp(1.4rem, 2.5vw, 2.3rem);
+}
+
+.achievement-slots span {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(146, 188, 190, 0.18), transparent);
+}
+
+@media (max-height: 800px) and (min-width: 761px) {
+    .achievement-panel {
+        min-height: 15rem;
+    }
+}
+
+.achievement-panel {
+    display: block !important;
+    max-height: 65vh;
+    overflow: auto;
+    padding: 24px !important
+}
+
+.medal-gallery {
+    display: grid;
+    grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px
+}
+
+.medal-card {
+    border: 1px solid #8e7c59;
+    background: #13242ddc;
+    padding: 16px;
+    text-align: center;
+    color: #d1c4a8
+}
+
+.medal-card svg {
+    width: 80px;
+    height: 92px
+}
+
+.medal-card h3 {
+    font-size: 16px
+}
+
+.medal-card p, .medal-card details {
+    font-size: 12px;
+    line-height: 1.7
+}
+
+.medal-card.locked {
+    opacity: .55
+}
+
+.medal-card details {
+    text-align: left
+}
+
+.medal-count {
+    color: #bba87e;
+    margin-bottom: 20px
+}

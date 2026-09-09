@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030506">
+    <link rel="icon" href="../img/favicon.svg">
+    <title>月尽时 | 主菜单</title>
+    <link rel="stylesheet" href="../shared/css/base.css">
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="../shared/js/common.js" defer></script>
+    <script src="./js/main.js" defer></script>
+</head>
+<body>
+<main class="page-shell main-shell" id="main-shell">
+    <div class="scene-background" aria-hidden="true"></div>
+    <div class="ambient-layer" aria-hidden="true">
+        <span class="ambient-dust"></span>
+        <span class="scanlines"></span>
+        <span class="film-grain"></span>
+    </div>
+
+    <header class="main-header">
+        <button class="team-brand" id="team-brand" type="button" aria-label="查看团队档案">
+            <img class="team-brand__logo" src="../img/lswzlogo.jpg" alt="Team Logo">
+            <img class="team-brand__name" src="../img/lswzname.png" alt="Team Name">
+        </button>
+
+        <section class="game-identity" aria-labelledby="main-title">
+            <p class="game-identity__signal">LUNAR MISSION SYSTEM // ONLINE</p>
+            <img class="game-mark" src="../img/logo.png" alt="Moon Without Return">
+            <h1 class="visually-hidden" id="main-title">月尽时 · 游戏主菜单</h1>
+        </section>
+    </header>
+
+    <nav class="main-menu" aria-label="游戏主菜单">
+        <ol class="main-menu__list">
+            <li>
+                <button class="menu-item is-selected" type="button" data-action="newGame" aria-current="true">
+                    <span class="menu-item__index">01 /</span>
+                    <span class="menu-item__copy">
+                            <span class="menu-item__zh">新游戏</span>
+                            <span class="menu-item__en">NEW GAME</span>
+                        </span>
+                    <span class="menu-item__line" aria-hidden="true"></span>
+                </button>
+            </li>
+            <li>
+                <button class="menu-item" type="button" data-action="loadGame">
+                    <span class="menu-item__index">02 /</span>
+                    <span class="menu-item__copy">
+                            <span class="menu-item__zh">读取存档</span>
+                            <span class="menu-item__en">LOAD GAME</span>
+                        </span>
+                    <span class="menu-item__line" aria-hidden="true"></span>
+                </button>
+            </li>
+            <li>
+                <button class="menu-item" type="button" data-action="achievements">
+                    <span class="menu-item__index">03 /</span>
+                    <span class="menu-item__copy">
+                            <span class="menu-item__zh">成就</span>
+                            <span class="menu-item__en">ACHIEVEMENTS</span>
+                        </span>
+                    <span class="menu-item__line" aria-hidden="true"></span>
+                </button>
+            </li>
+            <li>
+                <button class="menu-item" type="button" data-action="about">
+                    <span class="menu-item__index">04 /</span>
+                    <span class="menu-item__copy">
+                            <span class="menu-item__zh">关于我们</span>
+                            <span class="menu-item__en">ABOUT US</span>
+                        </span>
+                    <span class="menu-item__line" aria-hidden="true"></span>
+                </button>
+            </li>
+            <li>
+                <button class="menu-item" type="button" data-action="settings">
+                    <span class="menu-item__index">05 /</span>
+                    <span class="menu-item__copy">
+                            <span class="menu-item__zh">设置</span>
+                            <span class="menu-item__en">SETTINGS</span>
+                        </span>
+                    <span class="menu-item__line" aria-hidden="true"></span>
+                </button>
+            </li>
+        </ol>
+    </nav>
+
+    <section class="menu-feedback" id="menu-feedback" aria-live="polite" aria-atomic="true">
+        <p id="feedback-primary">MISSION INTERFACE READY</p>
+        <span id="feedback-secondary">等待任务指令</span>
+    </section>
+
+    <p class="main-philosophy">每一次出发，都可能只是另一种归来。</p>
+
+    <aside aria-label="系统状态">
+        <p class="corner-hud corner-hud--top-right">
+            <span class="corner-hud__label">SYSTEM TIME</span>
+            <time class="corner-hud__value" id="system-time" datetime="00:00:00">00:00:00</time>
+        </p>
+        <p class="corner-hud corner-hud--bottom-left">
+            <span class="corner-hud__label">LUNAR MISSION SYSTEM</span>
+            <span class="corner-hud__value">MISSION STATUS // UNKNOWN</span>
+        </p>
+        <p class="operator-hud">
+            <span>OPERATOR</span>
+            <strong id="operator-name">UNASSIGNED</strong>
+        </p>
+        <p class="communication-hud">COMMUNICATION // STANDBY</p>
+    </aside>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,216 @@
+
+.settings-shell .scene-background {
+    filter: brightness(0.4) saturate(0.6) contrast(1.1);
+}
+
+.settings-panel {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: clamp(0.75rem, 1.5vw, 1.4rem);
+}
+
+.settings-panel.archive-panel {
+    top: clamp(12rem, 23vh, 17rem);
+    width: min(90vw, 74rem);
+    max-height: 67vh;
+    overflow: auto
+}
+
+.controls-category {
+    min-height: 22rem
+}
+
+.binding-groups {
+    display: grid;
+    grid-template-columns:1fr 1fr;
+    gap: 1rem;
+    margin-top: .7rem
+}
+
+.binding-groups section {
+    min-width: 0
+}
+
+.binding-groups h3 {
+    margin: .35rem 0 .5rem;
+    color: rgba(194, 218, 216, .72);
+    font-size: .66rem;
+    letter-spacing: .14rem
+}
+
+.binding-groups section > div {
+    display: grid;
+    grid-template-columns:1fr 5.6rem;
+    align-items: center;
+    gap: .5rem;
+    padding: .24rem 0;
+    border-bottom: 1px solid rgba(137, 177, 179, .08);
+    font-size: .62rem
+}
+
+.binding-groups button, .control-actions button {
+    padding: .3rem .45rem;
+    border: 1px solid rgba(153, 201, 204, .25);
+    background: rgba(8, 20, 24, .7);
+    color: #c7dcda;
+    cursor: pointer
+}
+
+.binding-groups button.is-capturing {
+    border-color: #d2a15e;
+    color: #f0c787
+}
+
+.control-actions {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    margin-top: .8rem
+}
+
+.control-actions p {
+    margin: 0;
+    color: #88a3a2;
+    font-size: .57rem;
+    line-height: 1.45
+}
+
+.setting-category {
+    position: relative;
+    min-height: clamp(12rem, 26vh, 18rem);
+    padding: clamp(1rem, 1.8vw, 1.7rem);
+    border: 1px solid rgba(142, 188, 191, 0.13);
+    background: linear-gradient(155deg, rgba(10, 21, 24, 0.62), rgba(4, 9, 11, 0.26));
+}
+
+.setting-category::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 2.5rem;
+    height: 1px;
+    content: "";
+    background: rgba(170, 211, 213, 0.4);
+}
+
+.setting-category header {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(0.65rem, 1vw, 1rem);
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(145, 186, 188, 0.12);
+}
+
+.setting-category__index {
+    color: rgba(140, 174, 175, 0.34);
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    font-size: clamp(0.5rem, 0.56vw, 0.66rem);
+}
+
+.setting-category h2,
+.setting-category header p,
+.setting-category__status {
+    margin: 0;
+}
+
+.setting-category h2 {
+    color: rgba(208, 222, 220, 0.82);
+    font-size: clamp(0.78rem, 0.92vw, 1.08rem);
+    font-weight: 400;
+    letter-spacing: 0.22rem;
+}
+
+.setting-category header p {
+    margin-top: 0.25rem;
+    color: rgba(144, 178, 178, 0.4);
+    font-size: clamp(0.4rem, 0.45vw, 0.54rem);
+    letter-spacing: 0.16rem;
+}
+
+.setting-category__status {
+    margin-top: clamp(1.4rem, 3vh, 2.4rem);
+    color: rgba(145, 169, 168, 0.38);
+    font-size: clamp(0.48rem, 0.54vw, 0.64rem);
+    letter-spacing: 0.1rem;
+    line-height: 1.7;
+}
+
+.audio-placeholders {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.65rem, 1.2vh, 0.9rem);
+    padding: 0;
+    margin: clamp(1.1rem, 2.3vh, 1.8rem) 0 0;
+    list-style: none;
+}
+
+.audio-placeholders li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.16rem;
+    padding-bottom: 0.42rem;
+    border-bottom: 1px solid rgba(137, 177, 179, 0.08);
+    color: rgba(174, 193, 191, 0.52);
+    font-size: clamp(0.53rem, 0.6vw, 0.7rem);
+    letter-spacing: 0.12rem;
+}
+
+.audio-placeholders small {
+    color: rgba(130, 156, 156, 0.3);
+    font-size: 0.7em;
+    letter-spacing: 0.1rem;
+}
+
+.settings-pending {
+    grid-column: 1 / -1;
+    margin: 0.15rem 0 0;
+    color: rgba(151, 177, 176, 0.36);
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    font-size: clamp(0.42rem, 0.48vw, 0.57rem);
+    letter-spacing: clamp(0.12rem, 0.22vw, 0.26rem);
+    text-align: center;
+}
+
+@media (max-height: 800px) and (min-width: 761px) {
+    .setting-category {
+        min-height: 11rem;
+    }
+
+    .setting-category__status {
+        margin-top: 1.2rem;
+    }
+}
+
+@media (max-width: 760px) {
+    .settings-panel {
+        grid-template-columns: 1fr;
+        gap: 0.45rem;
+    }
+
+    .setting-category {
+        min-height: 5.5rem;
+    }
+
+    .setting-category__status,
+    .audio-placeholders {
+        margin-top: 0.65rem;
+    }
+
+    .audio-placeholders {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .binding-groups {
+        grid-template-columns:1fr
+    }
+
+    .settings-panel.archive-panel {
+        top: 11rem;
+        max-height: 70vh
+    }
+
+    .controls-category {
+        min-height: auto
+    }
+}

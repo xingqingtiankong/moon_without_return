@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "imageCount": 27,
+  "root": "img/maps",
+  "maps": [
+    {
+      "id": "MAP00",
+      "name": "区域总图",
+      "file": "00_总图/00_区域总图_平面版.png",
+      "connections": null
+    },
+    {
+      "id": "F00",
+      "name": "入户楼道",
+      "file": "01_家庭/F00_入户楼道.png",
+      "connections": "F01"
+    },
+    {
+      "id": "F01",
+      "name": "家庭公共区",
+      "file": "01_家庭/F01_家庭公共区.png",
+      "connections": [
+        "F00",
+        "F02",
+        "F03",
+        "F04",
+        "F05"
+      ]
+    },
+    {
+      "id": "F02",
+      "name": "主卧",
+      "file": "01_家庭/F02_主卧.png",
+      "connections": "F01"
+    },
+    {
+      "id": "F03",
+      "name": "小星房间",
+      "file": "01_家庭/F03_小星房间.png",
+      "connections": "F01"
+    },
+    {
+      "id": "F04",
+      "name": "卫生间",
+      "file": "01_家庭/F04_卫生间.png",
+      "connections": "F01"
+    },
+    {
+      "id": "F05",
+      "name": "阳台",
+      "file": "01_家庭/F05_阳台.png",
+      "connections": "F01"
+    },
+    {
+      "id": "R01",
+      "name": "工程师宿舍",
+      "file": "02_现实基地/R01_工程师宿舍.png",
+      "connections": "R02"
+    },
+    {
+      "id": "R02",
+      "name": "中央通道与升降梯前厅",
+      "file": "02_现实基地/R02_中央通道与升降梯前厅.png",
+      "connections": [
+        "R01",
+        "R03",
+        "R04",
+        "R07",
+        "R08",
+        "B01"
+      ]
+    },
+    {
+      "id": "R03",
+      "name": "休眠区",
+      "file": "02_现实基地/R03_休眠区.png",
+      "connections": [
+        "R02",
+        "R05",
+        "R06"
+      ]
+    },
+    {
+      "id": "R04",
+      "name": "维修区",
+      "file": "02_现实基地/R04_维修区.png",
+      "connections": "R02"
+    },
+    {
+      "id": "R05",
+      "name": "B区维修间",
+      "file": "02_现实基地/R05_B区维修间.png",
+      "connections": "R03"
+    },
+    {
+      "id": "R06",
+      "name": "通信与旧缓存室",
+      "file": "02_现实基地/R06_通信与旧缓存室.png",
+      "connections": [
+        "R03",
+        "R07"
+      ]
+    },
+    {
+      "id": "R07",
+      "name": "人格数据库",
+      "file": "02_现实基地/R07_人格数据库.png",
+      "connections": [
+        "R02",
+        "R06"
+      ]
+    },
+    {
+      "id": "R08",
+      "name": "气闸与装备间",
+      "file": "02_现实基地/R08_气闸与装备间.png",
+      "connections": [
+        "R02",
+        "R09"
+      ]
+    },
+    {
+      "id": "R09",
+      "name": "月面救援区",
+      "file": "02_现实基地/R09_月面救援区.png",
+      "connections": "R08"
+    },
+    {
+      "id": "B01",
+      "name": "地下梯厅与无门通道",
+      "file": "03_地下层/B01_梯厅与无门通道.png",
+      "connections": [
+        "R02",
+        "B02",
+        "B03",
+        "B04"
+      ]
+    },
+    {
+      "id": "B02",
+      "name": "培养区",
+      "file": "03_地下层/B02_培养区.png",
+      "connections": [
+        "B01",
+        "B05"
+      ]
+    },
+    {
+      "id": "B03",
+      "name": "前代档案室",
+      "file": "03_地下层/B03_前代档案室.png",
+      "connections": "B01"
+    },
+    {
+      "id": "B04",
+      "name": "广寒子核心机房",
+      "file": "03_地下层/B04_广寒子核心机房.png",
+      "connections": [
+        "B01",
+        "B05"
+      ]
+    },
+    {
+      "id": "B05",
+      "name": "生物资源循环模块",
+      "file": "03_地下层/B05_生物资源循环模块.png",
+      "connections": [
+        "B02",
+        "B04"
+      ]
+    },
+    {
+      "id": "A02",
+      "name": "档案中央通道",
+      "file": "04_档案重建/A02_中央通道.png",
+      "connections": [
+        "A03",
+        "A04",
+        "A07"
+      ]
+    },
+    {
+      "id": "A03",
+      "name": "档案休眠区",
+      "file": "04_档案重建/A03_休眠区.png",
+      "connections": [
+        "A02",
+        "A05",
+        "A06"
+      ]
+    },
+    {
+      "id": "A04",
+      "name": "档案维修区",
+      "file": "04_档案重建/A04_维修区.png",
+      "connections": "A02"
+    },
+    {
+      "id": "A05",
+      "name": "档案B区维修间",
+      "file": "04_档案重建/A05_B区维修间.png",
+      "connections": "A03"
+    },
+    {
+      "id": "A06",
+      "name": "档案通信与旧缓存室",
+      "file": "04_档案重建/A06_通信与旧缓存室.png",
+      "connections": [
+        "A03",
+        "A07"
+      ]
+    },
+    {
+      "id": "A07",
+      "name": "档案人格数据库",
+      "file": "04_档案重建/A07_人格数据库.png",
+      "connections": [
+        "A02",
+        "A06"
+      ]
+    }
+  ]
+}

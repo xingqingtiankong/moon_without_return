@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#05090c">
+    <link rel="icon" href="../img/favicon.svg">
+    <title>月尽时 | 场景探索</title>
+    <link rel="stylesheet" href="../shared/css/base.css">
+    <link rel="stylesheet" href="./css/game.css">
+    <link rel="stylesheet" href="./css/expedition.css">
+    <link rel="stylesheet" href="../shared/css/in-game-theme.css">
+    <script src="../shared/js/storage.js" defer></script>
+    <script src="../shared/js/ui-motion.js" defer></script>
+    <script src="./js/config.js" defer></script>
+    <script src="./js/story.js" defer></script>
+    <script src="./js/dialogue-reveal.js" defer></script>
+    <script src="./js/placements.js" defer></script>
+    <script src="./js/h01.js" defer></script>
+    <script src="./js/h02-day3.js" defer></script>
+    <script src="./js/campaign.js" defer></script>
+    <script src="./js/chapter1-investigation.js" defer></script>
+    <script src="./js/chapters23.js" defer></script>
+    <script src="./js/evidence.js" defer></script>
+    <script src="./js/chapters-final.js" defer></script>
+    <script src="../shared/js/endings.js" defer></script>
+    <script src="./js/branches-v5.js" defer></script>
+    <script src="./js/task-stations.js" defer></script>
+    <script src="./js/legacy-v5.js" defer></script>
+    <script src="./js/final-forms.js" defer></script>
+    <script src="./js/final-scenes.js" defer></script>
+    <script src="./js/chapter-media.js" defer></script>
+    <script src="./js/sound.js" defer></script>
+    <script src="./js/puzzle-score.js" defer></script>
+    <script src="./js/classic-games.js" defer></script>
+    <script src="./js/puzzle-activities.js" defer></script>
+    <script src="./js/expanded-games.js" defer></script>
+    <script src="./js/expanded-activities.js" defer></script>
+    <script src="./js/arcade-games.js" defer></script>
+    <script src="./js/arcade-activities.js" defer></script>
+    <script src="./js/puzzle-tutorials.js" defer></script>
+    <script src="./js/tutorial-workshop.js" defer></script>
+    <script src="./js/expedition-games.js" defer></script>
+    <script src="./js/expedition-activities.js" defer></script>
+    <script src="./js/activity-art.js" defer></script>
+    <script src="./js/puzzles.js" defer></script>
+    <script src="./js/activity-motion.js" defer></script>
+    <script src="./js/input.js" defer></script>
+    <script src="./js/chapter1.js" defer></script>
+    <script src="./js/overview.js" defer></script>
+    <script src="./js/walk-animation.js" defer></script>
+    <script src="./js/family-animation.js" defer></script>
+    <script src="./js/family-patrol.js" defer></script>
+    <script src="./js/score-v6.js" defer></script>
+    <script src="./js/polish-v6.js" defer></script>
+    <script src="./js/teaching-v6.js" defer></script>
+    <script src="./js/pipe-guide-v6.js" defer></script>
+    <script src="./js/drag-v6.js" defer></script>
+    <script src="./js/merge-motion-v6.js" defer></script>
+    <script src="./js/history-v6.js" defer></script>
+    <script src="./js/game.js" defer></script>
+    <script src="./js/test-history-ui-v6.js" defer></script>
+    <script src="./js/story-flow-v7.js" defer></script>
+    <script src="./js/ending-ui.js" defer></script>
+    <link rel="stylesheet" href="./css/polish-v6.css">
+</head>
+<body>
+<main class="map-game" id="map-game">
+    <section id="wake-screen" class="wake-screen" hidden><p>呼吸声离得很近。试着睁开眼睛。</p>
+        <button id="wake-start" type="button">睁开眼睛</button>
+    </section>
+    <aside id="story-detail" class="story-detail" hidden aria-label="正在查看的物件"></aside>
+    <canvas id="scene" width="1672" height="941" aria-label="地图探索场景"></canvas>
+    <div class="screen-shade" aria-hidden="true"></div>
+
+    <header class="location-hud" aria-label="当前位置" data-status-hud aria-live="polite" hidden>
+        <small><span class="dev-mark">DEV</span><span id="chapter-day">第一章 · 第一天</span></small>
+        <strong id="zone-name">现实基地</strong>
+        <span><b id="room-id">R02</b><span id="room-name">中央通道与升降梯前厅</span></span>
+    </header>
+
+    <aside class="task-hud" id="task-hud" aria-labelledby="task-hud-title" data-status-hud aria-live="polite" hidden>
+        <header>
+            <div><small><span class="dev-mark">DEV</span>界面示例</small>
+                <h2 id="task-hud-title">当前任务</h2></div>
+            <b id="task-count">0/2</b></header>
+        <ul id="task-list">
+            <li><span>□</span>示例目标一</li>
+            <li><span>□</span>示例目标二</li>
+        </ul>
+    </aside>
+
+    <section class="debug-tools" id="debug-tools" aria-label="地图调试工具" hidden>
+        <label class="map-picker"><span>切换校准地图</span><select id="map-select"
+                                                                   aria-label="切换校准地图"></select></label>
+        <div class="debug-toggle-row">
+            <button type="button" id="collision-toggle" aria-pressed="false">显示碰撞层</button>
+            <button type="button" id="door-shape-toggle" aria-pressed="false">显示门范围</button>
+        </div>
+        <button type="button" id="coordinate-toggle" aria-pressed="false">开启坐标采集</button>
+        <section class="coordinate-panel" id="coordinate-panel" aria-label="交互坐标采集" hidden>
+            <p id="coordinate-status">开启后点击地图，读取未经吸附的逻辑坐标。</p>
+            <label><span>对象 ID</span><input id="coordinate-object-id" type="text" maxlength="48"
+                                              placeholder="例如 h01_block"></label>
+            <label><span>触发形状</span><select id="coordinate-shape">
+                <option value="circle">圆形</option>
+                <option value="rect">矩形</option>
+            </select></label>
+            <label class="coordinate-radius"><span>半径</span><input id="coordinate-radius" type="number" min="1"
+                                                                     max="600" step="1" value="80"></label>
+            <div class="coordinate-rect" hidden>
+                <label><span>宽度</span><input id="coordinate-width" type="number" min="1" max="1200" step="1"
+                                               value="160"></label>
+                <label><span>高度</span><input id="coordinate-height" type="number" min="1" max="900" step="1"
+                                               value="120"></label>
+            </div>
+            <button type="button" id="copy-coordinate" disabled>复制 JSON 草稿</button>
+            <textarea id="coordinate-output" rows="8" readonly aria-label="坐标JSON草稿"></textarea>
+        </section>
+        <div class="connection-panel"><small>相邻房间</small>
+            <ul id="connection-list"></ul>
+        </div>
+    </section>
+
+    <p class="door-prompt interaction-prompt" id="door-prompt" hidden></p>
+    <p class="load-error" id="load-error" role="alert" hidden></p>
+    <p class="map-unavailable" id="map-unavailable" role="status" aria-live="polite" hidden>当前区域不提供地图。</p>
+
+    <nav class="key-guide" aria-label="探索操作" data-status-hud hidden>
+        <span><kbd id="key-journal">Q</kbd>任务</span>
+        <span><kbd id="key-map">Tab</kbd>地图</span>
+        <span><kbd id="key-pause">Esc</kbd>暂停</span>
+        <span class="debug-key" hidden><kbd id="key-move">WASD</kbd>移动</span>
+        <span class="debug-key" hidden><kbd id="key-interact">F</kbd>通过门</span>
+    </nav>
+
+    <section class="dialogue-layer ui-layer" id="dialogue" hidden role="dialog" aria-modal="true"
+             aria-labelledby="dialogue-speaker">
+        <img id="dialogue-portrait" src="../img/characters/azhi/azhi-portrait.png" alt="阿芷">
+        <div class="dialogue-box" aria-live="polite">
+            <header><strong id="dialogue-speaker">阿芷</strong><span id="dialogue-role">妻子</span><i class="dev-mark">DEV
+                示例</i></header>
+            <p id="dialogue-text">这是一段用于检查排版的示例文字。</p>
+            <footer><kbd id="key-dialogue">Space</kbd><span>继续</span><i></i></footer>
+        </div>
+        <button type="button" id="skip-dialogue" class="dialogue-skip" title="跳过本段对白，选项仍需亲自选择">
+            <span>跳过</span>
+            <svg viewBox="0 0 24 18" aria-hidden="true">
+                <path d="m2 2 9 7-9 7zm10 0 9 7-9 7z"/>
+            </svg>
+            <kbd>Enter</kbd></button>
+    </section>
+
+    <section class="overlay ui-layer" id="journal" hidden role="dialog" aria-modal="true"
+             aria-labelledby="journal-title">
+        <div class="journal-panel panel-large">
+            <header class="panel-heading">
+                <div><small><span class="dev-mark">DEV</span>界面示例</small>
+                    <h1 id="journal-title">任务与证据</h1></div>
+                <button type="button" data-close="journal" aria-label="关闭任务与证据">关闭</button>
+            </header>
+            <div class="journal-tabs" role="tablist" aria-label="任务与证据分类">
+                <button type="button" role="tab" aria-selected="true">任务</button>
+                <button type="button" role="tab" aria-selected="false">证据</button>
+            </div>
+            <article class="journal-entry">
+                <header><h2>当前任务</h2><b>0/2</b></header>
+                <p>这里显示当前目标说明。正式内容将在剧情步骤接入。</p>
+                <ul>
+                    <li>□ 示例目标一</li>
+                    <li>□ 示例目标二</li>
+                </ul>
+            </article>
+        </div>
+    </section>
+
+    <section class="overlay map-overlay ui-layer" id="overview" hidden role="dialog" aria-modal="true"
+             aria-label="区域地图">
+        <h1 id="overview-title" class="sr-only">现实基地</h1>
+        <div class="overview-content">
+            <div class="overview-map-frame">
+                <img id="overview-image" src="../img/maps/00_总图/基地主层.png" alt="当前区域分区图">
+                <div id="overview-markers" aria-label="房间位置标记"></div>
+            </div>
+            <footer class="overview-info">
+                <div class="overview-legend"><strong id="overview-current">当前位置：R02 ·
+                    中央通道与升降梯前厅</strong><span>蓝色 ● 当前位置　金色 ◆ 任务所在房间</span></div>
+                <ul id="overview-targets" aria-label="当前任务位置"></ul>
+                <small id="overview-note">再次按Tab或按Esc关闭地图。</small>
+            </footer>
+        </div>
+    </section>
+
+    <section class="overlay ui-layer" id="pause" hidden role="dialog" aria-modal="true" aria-labelledby="pause-title">
+        <div class="pause-panel">
+            <small>游戏已暂停</small>
+            <h1 id="pause-title">暂停</h1>
+            <button type="button" id="resume">继续</button>
+            <button type="button" id="pause-save">保存进度</button>
+            <a href="../settings/index.html?return=game">设置</a>
+            <button type="button" id="request-main-menu">返回主菜单</button>
+        </div>
+    </section>
+
+    <section class="overlay ui-layer" id="save-game" hidden role="dialog" aria-modal="true"
+             aria-labelledby="save-game-title">
+        <div class="panel-large game-save-panel">
+            <header class="panel-heading">
+                <div><small>本地记录</small>
+                    <h1 id="save-game-title">保存进度</h1></div>
+                <button type="button" data-close="save-game">返回</button>
+            </header>
+            <p id="save-game-note"></p>
+            <div id="game-save-slots"></div>
+            <p id="save-game-status" role="status" aria-live="polite"></p>
+        </div>
+    </section>
+
+    <section class="overlay ui-layer" id="leave-confirm" hidden role="dialog" aria-modal="true"
+             aria-labelledby="leave-title">
+        <div class="confirm-panel"><small>请确认</small>
+            <h1 id="leave-title">返回主菜单？</h1>
+            <p>尚未保存的进度可能丢失。</p>
+            <div>
+                <button type="button" id="cancel-leave" data-close="leave-confirm">取消</button>
+                <a href="../main/index.html">确认返回</a></div>
+        </div>
+    </section>
+
+    <section class="choice-layer ui-layer" id="choice" hidden role="dialog" aria-modal="true"
+             aria-labelledby="choice-title">
+        <div class="choice-list">
+            <button type="button">示例选项一</button>
+            <button type="button">示例选项二</button>
+        </div>
+        <div class="choice-dialogue"><small><span class="dev-mark">DEV</span>选择外壳</small>
+            <p id="choice-title">请选择回应</p></div>
+    </section>
+
+    <section class="overlay ui-layer" id="terminal" hidden role="dialog" aria-modal="true"
+             aria-labelledby="terminal-title">
+        <div class="terminal-panel panel-large">
+            <header class="panel-heading">
+                <div><small><span class="dev-mark">DEV</span>终端界面示例</small>
+                    <h1 id="terminal-title">设备终端</h1></div>
+                <button type="button" data-close="terminal">关闭</button>
+            </header>
+            <div class="terminal-body"><p class="terminal-label">当前操作</p>
+                <h2>等待任务数据</h2>
+                <p>这里只验证终端信息层级、键盘焦点和主操作按钮。正式设备字段将在任务步骤接入。</p>
+                <button type="button" class="primary-action">执行示例操作</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="overlay ui-layer" id="minigame" hidden role="dialog" aria-modal="true"
+             aria-labelledby="minigame-title">
+        <div class="minigame-panel panel-large">
+            <header class="panel-heading">
+                <div><small><span class="dev-mark">DEV</span>操作记录</small>
+                    <h1 id="minigame-title">小游戏</h1></div>
+                <div class="minigame-actions">
+                    <button type="button" id="retry-minigame"><kbd>R</kbd> 重新挑战</button>
+                    <button type="button" data-close="minigame">退出</button>
+                </div>
+            </header>
+            <div class="minigame-stage" aria-label="小游戏内容区域"><p>正式玩法尚未接入</p></div>
+        </div>
+    </section>
+
+    <section class="overlay ui-layer" id="ending" hidden role="dialog" aria-modal="true" aria-labelledby="ending-title">
+        <div class="ending-panel"><small><span class="dev-mark">DEV</span>章节结算外壳</small>
+            <h1 id="ending-title">第一章结束</h1>
+            <p>结算内容将在章节完成后生成。</p>
+            <button type="button" data-close="ending">继续</button>
+        </div>
+    </section>
+
+    <div class="small-screen-warning">窗口过窄，无法可靠显示游戏界面。请把窗口宽度调整到至少760px。</div>
+</main>
+</body>
+</html>
+

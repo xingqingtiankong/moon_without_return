@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030506">
+    <link rel="icon" href="../img/favicon.svg">
+    <title>月尽时 | 任务档案</title>
+    <link rel="stylesheet" href="../shared/css/base.css">
+    <link rel="stylesheet" href="./css/save.css">
+    <script src="../shared/js/common.js" defer></script>
+    <script src="../shared/js/storage.js" defer></script>
+    <script src="./js/save.js" defer></script>
+</head>
+<body>
+<main class="page-shell save-shell">
+    <div class="scene-background" aria-hidden="true"></div>
+    <div class="ambient-layer" aria-hidden="true">
+        <span class="ambient-dust"></span>
+        <span class="scanlines"></span>
+        <span class="film-grain"></span>
+    </div>
+
+    <header class="inner-header">
+        <img class="game-mark" src="../img/logo.png" alt="Moon Without Return">
+        <h1 class="inner-title">任务档案</h1>
+        <p class="inner-subtitle">SAVE ARCHIVE</p>
+    </header>
+
+    <section class="archive-panel save-panel" aria-labelledby="archive-directory-title">
+        <header class="panel-heading">
+            <h2 id="archive-directory-title">存档目录</h2>
+            <p id="archive-count">LOCAL MISSION RECORDS</p>
+        </header>
+        <ol class="save-slots" id="save-slots" aria-label="存档槽位"></ol>
+    </section>
+
+    <button class="back-control" id="back-button" type="button">
+        <span>返回</span>
+        <small>BACK</small>
+    </button>
+
+    <aside aria-label="系统状态">
+        <p class="corner-hud corner-hud--top-right">
+            <span class="corner-hud__label">SYSTEM TIME</span>
+            <time class="corner-hud__value" id="system-time" datetime="00:00:00">00:00:00</time>
+        </p>
+        <p class="corner-hud corner-hud--bottom-right">
+            <span class="corner-hud__label">ARCHIVE LINK</span>
+            <span class="corner-hud__value">LOCAL // STANDBY</span>
+        </p>
+    </aside>
+</main>
+</body>
+</html>

@@ -1,0 +1,345 @@
+.expedition-board {
+    max-width: 1000px;
+    margin: 8px auto;
+    padding: 14px;
+    border: 1px solid #71817a;
+    background: radial-gradient(ellipse at 20% 0%, #71847424, transparent 60%), repeating-linear-gradient(0deg, #ffffff03 0 1px, transparent 1px 4px), #13232b;
+    box-shadow: inset 0 0 0 4px #101a20, inset 0 0 0 5px #60746b66;
+    position: relative
+}
+
+.expedition-board:before, .expedition-board:after {
+    content: '✥';
+    position: absolute;
+    top: 2px;
+    color: #a89b75;
+    font-size: 12px
+}
+
+.expedition-board:before {
+    left: 3px
+}
+
+.expedition-board:after {
+    right: 3px
+}
+
+.expedition-canvas {
+    display: block;
+    width: min(100%, 900px);
+    max-height: 46vh;
+    object-fit: contain;
+    margin: auto;
+    border: 1px solid #61777d;
+    touch-action: none
+}
+
+.expedition-grid {
+    display: grid;
+    grid-template-columns:repeat(var(--cols), minmax(40px, 72px));
+    gap: 8px;
+    width: max-content;
+    max-width: 100%
+}
+
+.light-tile {
+    aspect-ratio: 1;
+    border-radius: 8px !important;
+    background: #192b31 !important;
+    color: #688076 !important
+}
+
+.light-tile.lit {
+    background: radial-gradient(circle, #f6d894, #a27945) !important;
+    box-shadow: 0 0 20px #eaca6b44, inset 0 0 0 5px #a49265;
+    color: #342f25 !important
+}
+
+.light-tile.dark {
+    box-shadow: inset 0 2px 8px #050d16
+}
+
+.nonogram-grid {
+    display: grid;
+    grid-template-columns:minmax(70px, auto) repeat(var(--cols), minmax(26px, 42px));
+    gap: 2px;
+    justify-content: center
+}
+
+.nonogram-grid b {
+    white-space: pre-line;
+    align-self: end;
+    text-align: center;
+    color: #e0cc9d;
+    font: 600 15px/1.4 monospace;
+    padding: 5px
+}
+
+.nonogram-grid button {
+    min-width: 0;
+    min-height: 28px;
+    aspect-ratio: 1;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #b2b2a0 !important;
+    color: #243941 !important;
+    border: 1px solid #556b71 !important
+}
+
+.nonogram-grid button.filled {
+    background: linear-gradient(135deg, #476673, #213943) !important;
+    box-shadow: inset 0 0 0 2px #8ba4a566
+}
+
+.logic-clues {
+    columns: 2;
+    column-gap: 28px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #d6cfb7
+}
+
+.logic-clues li {
+    break-inside: avoid;
+    margin: 3px 0
+}
+
+.logic-tables {
+    display: flex;
+    gap: 22px;
+    justify-content: center;
+    flex-wrap: wrap
+}
+
+.logic-tables table {
+    border-collapse: collapse
+}
+
+.logic-tables caption {
+    padding: 8px;
+    color: #d9c69d;
+    letter-spacing: 2px
+}
+
+.logic-tables th {
+    padding: 4px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #b7c3be
+}
+
+.logic-tables td {
+    border: 1px solid #536b70
+}
+
+.logic-tables button {
+    width: 38px;
+    height: 32px;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #1b323b !important
+}
+
+.logic-tables button.confirmed {
+    color: #edd295 !important;
+    background: #52695d !important
+}
+
+.workshop-guide .expedition-canvas {
+    max-height: 28vh
+}
+
+.workshop-guide .logic-clues {
+    font-size: 12px
+}
+
+.workshop-guide .logic-tables button {
+    height: 24px
+}
+
+.workshop-guide .nonogram-grid button {
+    min-height: 18px
+}
+
+.workshop-guide .nonogram-grid {
+    grid-template-columns:60px repeat(var(--cols), 26px)
+}
+
+.arcade-board:not(.arcade-parkour):not(.arcade-jump):not(.arcade-tetris) {
+    background-image: repeating-linear-gradient(90deg, #bfa87805 0 1px, transparent 1px 5px);
+    box-shadow: inset 0 0 0 1px #a9976a44;
+    padding: 10px
+}
+
+.pair-cell, .mine-covered, .playing-card, .cache-tile {
+    border-top-color: #c1b890 !important;
+    border-left-color: #8d9a87 !important;
+    box-shadow: inset 0 0 0 2px #0a182332, 2px 3px 0 #040d1480
+}
+
+.pair-cell.cleared {
+    visibility: hidden !important;
+    pointer-events: none
+}
+
+.arcade-link .pair-cell:not(.label-pair) {
+    position: relative
+}
+
+.arcade-link .pair-cell:not(.label-pair):after {
+    content: attr(data-symbol);
+    font: 10px monospace;
+    position: absolute;
+    bottom: 3px;
+    right: 5px;
+    color: #b9b19a
+}
+
+.playing-card:after {
+    content: '✥';
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    font-size: 10px;
+    opacity: .45
+}
+
+.word-cell {
+    box-shadow: inset 0 0 0 2px #9b926335
+}
+
+.puzzle-controls button {
+    transition: filter .18s, box-shadow .18s, background-color .18s
+}
+
+.puzzle-controls button:hover:not(:disabled) {
+    filter: brightness(1.15)
+}
+
+.operation-spark {
+    position: fixed;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e8d09a;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999
+}
+
+.operation-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 99998
+}
+
+.ending-medal svg {
+    width: 100px;
+    height: 115px
+}
+
+.ending-medal {
+    text-align: center;
+    color: #d8c496
+}
+
+.medal-gallery {
+    display: grid;
+    grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px
+}
+
+.medal-card {
+    padding: 14px;
+    background: #15252edb;
+    border: 1px solid #817759;
+    text-align: center;
+    color: #cfc9b6
+}
+
+.medal-card svg {
+    width: 80px;
+    height: 92px
+}
+
+.medal-card h3 {
+    font-size: 16px;
+    font-weight: 500
+}
+
+.medal-card p {
+    font-size: 12px;
+    line-height: 1.7
+}
+
+.medal-card.locked {
+    opacity: .55
+}
+
+.medal-card details {
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.7
+}
+
+.achievement-overlay .panel-large {
+    max-height: 88vh;
+    overflow: auto;
+    width: min(1100px, 92vw)
+}
+
+.achievement-overlay header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+}
+
+.medal-toast {
+    position: fixed;
+    top: 95px;
+    right: 24px;
+    z-index: 5000;
+    background: #162b35f5;
+    border: 1px solid #c6af7f;
+    padding: 16px 24px;
+    color: #e2cda3;
+    box-shadow: 0 5px 30px #0008
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .operation-spark, .operation-ghost {
+        display: none
+    }
+
+    .puzzle-controls button {
+        transition: none
+    }
+}
+
+#minigame .puzzle-content[data-activity="logic-grid"] .expedition-board {
+    width: 100%;
+    box-sizing: border-box
+}
+
+#minigame .puzzle-content[data-activity="logic-grid"][data-phase="play"] > h2, #minigame .puzzle-content[data-activity="side-runner"][data-phase="play"] > h2 {
+    display: none
+}
+
+#minigame .puzzle-content[data-activity="logic-grid"] .logic-clues {
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 4px 0 10px
+}
+
+#minigame .puzzle-content[data-activity="logic-grid"] .logic-tables button {
+    width: 42px;
+    height: 32px
+}
+
+#minigame .puzzle-content[data-activity="logic-grid"] .logic-tables {
+    gap: 40px
+}
+
+#minigame .puzzle-content[data-activity="side-runner"] .expedition-board {
+    width: 100%
+}

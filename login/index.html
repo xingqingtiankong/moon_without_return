@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#05080a">
+    <link rel="icon" href="../img/favicon.svg">
+    <title>月尽时 | MOON WITHOUT RETURN</title>
+    <link rel="stylesheet" href="./css/login.css">
+    <script src="./js/login.js" defer></script>
+</head>
+<body>
+<div class="game-shell" id="app" data-screen="start" data-auth-mode="login">
+    <div class="scene-background" aria-hidden="true"></div>
+    <div class="ambient-layer" aria-hidden="true">
+        <span class="ambient-dust ambient-dust--near"></span>
+        <span class="ambient-dust ambient-dust--far"></span>
+        <span class="scanlines"></span>
+        <span class="film-grain"></span>
+    </div>
+
+    <aside class="system-hud" aria-label="月面系统状态">
+        <p class="hud-item hud-item--top-left">
+            <span class="hud-label">LUNAR SYSTEM</span>
+            <span class="hud-value">NODE 07 // KAIROS</span>
+        </p>
+        <p class="hud-item hud-item--top-right">
+            <span class="hud-label">SYSTEM TIME</span>
+            <time class="hud-value" id="system-time" datetime="00:00:00">00:00:00</time>
+        </p>
+        <p class="hud-item hud-item--bottom-left">
+            <span class="hud-label">MISSION ARCHIVE</span>
+            <span class="hud-value">UNKNOWN // RECOVERY 00%</span>
+        </p>
+        <p class="hud-item hud-item--bottom-right">
+            <span class="hud-label">COMMUNICATION LINK</span>
+            <span class="hud-value" id="link-status">STANDBY</span>
+        </p>
+    </aside>
+
+    <main class="game-main">
+        <section class="start-screen" id="start-screen" aria-labelledby="game-title">
+            <header class="start-brand">
+                <p class="signal-code">ARCHIVE 17 // SIGNAL REACQUIRED</p>
+                <img
+                        class="start-logo"
+                        src="../img/logo.png"
+                        alt="Moon Without Return Logo"
+                >
+                <h1 class="visually-hidden" id="game-title">月尽时 · Moon Without Return</h1>
+                <p class="start-subtitle">A LOST TRANSMISSION FROM THE LUNAR NIGHT</p>
+            </header>
+
+            <button class="start-trigger" id="start-trigger" type="button">
+                <span class="start-trigger__zh">按任意键开始</span>
+                <span class="start-trigger__en">PRESS ANY KEY TO CONTINUE</span>
+            </button>
+
+            <p class="philosophy-copy">如果归途从未存在，我们又为何记得故乡？</p>
+            <p class="start-build">PROJECT // MOON WITHOUT RETURN&nbsp;&nbsp;&nbsp; BUILD 07.17</p>
+        </section>
+
+        <section class="auth-screen" id="auth-screen" aria-label="身份认证终端" aria-hidden="true">
+            <div class="auth-stage">
+                <article class="auth-terminal" id="auth-terminal">
+                    <img
+                            class="terminal-frame"
+                            src="../img/sign_in.png"
+                            alt=""
+                    >
+
+                    <header class="auth-heading">
+                        <img
+                                class="auth-logo"
+                                id="auth-logo"
+                                src="../img/logo.png"
+                                alt="Moon Without Return Logo"
+                        >
+                        <p class="auth-heading__en" id="auth-heading-en">IDENTITY VERIFICATION</p>
+                        <h2 class="auth-heading__zh" id="auth-heading-zh">身份认证</h2>
+                    </header>
+
+                    <form class="auth-form login-form is-active" id="login-form" novalidate>
+                        <label class="terminal-field field-user">
+                                <span class="field-label">
+                                    <span class="field-label__zh">用户名</span>
+                                    <span class="field-label__en">USER ID</span>
+                                </span>
+                            <input
+                                    id="login-username"
+                                    name="username"
+                                    type="text"
+                                    autocomplete="username"
+                                    spellcheck="false"
+                                    aria-label="登录用户名"
+                                    required
+                            >
+                        </label>
+
+                        <label class="terminal-field field-password">
+                                <span class="field-label">
+                                    <span class="field-label__zh">密码</span>
+                                    <span class="field-label__en">PASSWORD</span>
+                                </span>
+                            <input
+                                    id="login-password"
+                                    name="password"
+                                    type="password"
+                                    autocomplete="current-password"
+                                    aria-label="登录密码"
+                                    required
+                            >
+                        </label>
+
+                        <button class="terminal-submit" id="login-submit" type="submit">
+                            <span>确认身份</span>
+                            <small>VERIFY</small>
+                        </button>
+
+                        <p class="mode-switch">
+                            <span>尚未建立身份档案？</span>
+                            <button class="mode-switch__button" id="show-register" type="button">
+                                创建身份档案 <small>CREATE IDENTITY RECORD</small>
+                            </button>
+                        </p>
+                    </form>
+
+                    <form class="auth-form register-form" id="register-form" aria-hidden="true" novalidate>
+                        <label class="terminal-field field-user">
+                                <span class="field-label">
+                                    <span class="field-label__zh">用户名</span>
+                                    <span class="field-label__en">USER ID</span>
+                                </span>
+                            <input
+                                    id="register-username"
+                                    name="username"
+                                    type="text"
+                                    autocomplete="username"
+                                    spellcheck="false"
+                                    aria-label="注册用户名"
+                                    required
+                                    disabled
+                            >
+                        </label>
+
+                        <label class="terminal-field field-password">
+                                <span class="field-label">
+                                    <span class="field-label__zh">密码</span>
+                                    <span class="field-label__en">PASSWORD</span>
+                                </span>
+                            <input
+                                    id="register-password"
+                                    name="password"
+                                    type="password"
+                                    autocomplete="new-password"
+                                    aria-label="注册密码"
+                                    required
+                                    disabled
+                            >
+                        </label>
+
+                        <button class="terminal-submit" id="register-submit" type="submit" disabled>
+                            <span>建立档案</span>
+                            <small>CREATE</small>
+                        </button>
+
+                        <p class="mode-switch">
+                            <span>已有身份档案？</span>
+                            <button class="mode-switch__button" id="show-login" type="button" disabled>
+                                返回身份验证 <small>RETURN TO VERIFICATION</small>
+                            </button>
+                        </p>
+                    </form>
+
+                    <section class="system-feedback" id="system-feedback" aria-live="polite" aria-atomic="true">
+                        <p class="feedback-code" id="feedback-code">ARCHIVE LINK STANDBY</p>
+                        <p class="feedback-message" id="feedback-message">等待身份密钥</p>
+                        <p class="feedback-detail" id="feedback-detail">输入记录仅在本地终端中验证</p>
+                    </section>
+
+                    <p class="terminal-serial">LUNAR IDENTITY GATEWAY // NODE 07 // OFFLINE ARCHIVE</p>
+                </article>
+
+                <section class="auth-result" id="auth-result" aria-live="assertive" aria-hidden="true">
+                    <p class="auth-result__code">IDENTITY VERIFIED</p>
+                    <h2>身份认证通过</h2>
+                </section>
+
+                <p class="auth-side-note" aria-hidden="true">
+                    <span>IDENTITY TRACE</span>
+                    <span>MEMORY HASH // UNRESOLVED</span>
+                    <span>RETURN VECTOR // NULL</span>
+                </p>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

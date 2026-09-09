@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030506">
+    <link rel="icon" href="../img/favicon.svg">
+    <title>月尽时 | 成就记录</title>
+    <link rel="stylesheet" href="../shared/css/base.css">
+    <link rel="stylesheet" href="./css/achievement.css">
+    <script src="../shared/js/common.js" defer></script>
+    <script src="../shared/js/endings.js" defer></script>
+    <script src="./js/achievement.js" defer></script>
+</head>
+<body>
+<main class="page-shell achievement-shell">
+    <div class="scene-background" aria-hidden="true"></div>
+    <div class="ambient-layer" aria-hidden="true">
+        <span class="ambient-dust"></span>
+        <span class="scanlines"></span>
+        <span class="film-grain"></span>
+    </div>
+
+    <header class="inner-header">
+        <img class="game-mark" src="../img/logo.png" alt="Moon Without Return">
+        <h1 class="inner-title">成就记录</h1>
+        <p class="inner-subtitle">ACHIEVEMENT ARCHIVE</p>
+    </header>
+
+    <section class="archive-panel achievement-panel" aria-labelledby="achievement-empty-title">
+        <div class="empty-node" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <p class="empty-code">ARCHIVE QUERY // ZERO RECORDS</p>
+        <h2 id="achievement-empty-title">暂无成就数据</h2>
+        <p class="empty-subtitle">NO ACHIEVEMENT DATA</p>
+        <div class="achievement-slots" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </section>
+
+    <button class="back-control" id="back-button" type="button">
+        <span>返回</span>
+        <small>BACK</small>
+    </button>
+
+    <aside aria-label="系统状态">
+        <p class="corner-hud corner-hud--top-right">
+            <span class="corner-hud__label">SYSTEM TIME</span>
+            <time class="corner-hud__value" id="system-time" datetime="00:00:00">00:00:00</time>
+        </p>
+        <p class="corner-hud corner-hud--bottom-right">
+            <span class="corner-hud__label">ACHIEVEMENT NODE</span>
+            <span class="corner-hud__value">NO DATA</span>
+        </p>
+    </aside>
+</main>
+</body>
+</html>

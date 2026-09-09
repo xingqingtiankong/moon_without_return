@@ -1,0 +1,685 @@
+.map-game, .settings-shell {
+    --skin-ink: #080b0c;
+    --skin-paper: #d7dcd7;
+    --skin-soft: #a2ada8;
+    --skin-muted: #7f918c;
+    --skin-gold: #bfa47a;
+    --skin-rule: rgba(166, 190, 186, .19);
+    --text: var(--skin-paper);
+    --muted: var(--skin-soft);
+    --weak: var(--skin-muted);
+    --cyan: #a9bcb7;
+    --amber: var(--skin-gold);
+    --line: var(--skin-rule);
+    --panel: rgba(7, 10, 11, .92);
+    --modal: rgba(7, 10, 11, .97);
+    color: var(--skin-paper);
+}
+
+.map-game .location-hud, .map-game .task-hud, .map-game .key-guide {
+    border-color: transparent;
+    background: linear-gradient(100deg, rgba(4, 8, 9, .9), rgba(4, 8, 9, .55));
+    box-shadow: inset 0 -1px rgba(163, 188, 182, .19);
+}
+
+.map-game .location-hud {
+    border-left-color: rgba(191, 164, 122, .58)
+}
+
+.map-game .location-hud > strong {
+    color: #e0e3dc
+}
+
+.map-game .location-hud b, .map-game .task-hud li span {
+    color: #a4b7af
+}
+
+.map-game .task-hud header {
+    border-color: rgba(166, 190, 186, .14)
+}
+
+.map-game .task-hud header > b {
+    color: #bfa47a
+}
+
+.map-game .key-guide {
+    background: linear-gradient(90deg, rgba(5, 9, 10, .68), rgba(5, 9, 10, .92))
+}
+
+.map-game kbd {
+    background: rgba(145, 169, 161, .035);
+    border-color: rgba(163, 183, 175, .25);
+    color: #bdc9c2;
+    box-shadow: none;
+}
+
+.map-game .dev-mark {
+    color: #84968c
+}
+
+.map-game .interaction-prompt, .map-game .map-unavailable {
+    background: rgba(5, 9, 10, .94);
+    border-color: transparent;
+    border-bottom-color: rgba(191, 164, 122, .55);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+    color: #dadfd7;
+}
+
+.map-game .dialogue-box, .map-game .choice-dialogue,
+.map-game .panel-large, .map-game .pause-panel,
+.map-game .confirm-panel, .map-game .ending-panel {
+    background: linear-gradient(105deg, rgba(151, 164, 146, .025), transparent 42%),
+    linear-gradient(180deg, rgba(12, 16, 16, .97), rgba(5, 8, 9, .98));
+    border-color: rgba(151, 175, 166, .16);
+    border-top-color: rgba(190, 165, 122, .47);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .3), inset 0 1px rgba(222, 214, 190, .025);
+}
+
+.map-game .dialogue-box {
+    border-right-color: transparent;
+    border-left-color: transparent
+}
+
+.map-game .dialogue-box header, .map-game .panel-heading,
+.map-game .choice-dialogue small {
+    border-bottom-color: rgba(159, 181, 171, .17)
+}
+
+.map-game .dialogue-box header strong {
+    color: #cfb78c
+}
+
+.map-game .dialogue-box p, .map-game .choice-dialogue p {
+    color: #e1e3da
+}
+
+.map-game .dialogue-box header span, .map-game .dialogue-box footer {
+    color: #9caea3
+}
+
+.map-game .dialogue-box footer i {
+    background: linear-gradient(90deg, rgba(167, 188, 177, .23), transparent)
+}
+
+.map-game .dialogue-layer > img {
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, .35))
+}
+
+.map-game .overlay {
+    background: rgba(2, 5, 6, .76)
+}
+
+.map-game .map-overlay {
+    background: rgba(0, 0, 0, .78)
+}
+
+.map-game .panel-heading button, .map-game .pause-panel button,
+.map-game .pause-panel a, .map-game .confirm-panel button,
+.map-game .confirm-panel a, .map-game .ending-panel button,
+.map-game .choice-list button, .map-game .primary-action {
+    background: linear-gradient(90deg, rgba(151, 177, 165, .04), transparent);
+    border-color: rgba(151, 177, 165, .12);
+    border-bottom-color: rgba(151, 177, 165, .28);
+    color: #becac2;
+    box-shadow: none;
+    text-shadow: none;
+    transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.map-game .primary-action {
+    border-color: rgba(191, 164, 122, .4);
+    color: #cfb78c
+}
+
+.map-game .pause-panel button, .map-game .pause-panel a,
+.map-game .ending-panel button {
+    border-color: transparent;
+    border-bottom-color: rgba(151, 177, 165, .22);
+    background: transparent;
+}
+
+.map-game .pause-panel, .map-game .confirm-panel, .map-game .ending-panel {
+    border-left-color: transparent;
+    border-right-color: transparent;
+}
+
+.map-game .choice-list button {
+    border-radius: .55rem;
+    background-color: rgba(6, 10, 11, .95)
+}
+
+.map-game .panel-heading button:hover, .map-game .pause-panel button:hover,
+.map-game .pause-panel a:hover, .map-game .confirm-panel button:hover,
+.map-game .confirm-panel a:hover, .map-game .ending-panel button:hover,
+.map-game .choice-list button:hover, .map-game .primary-action:hover {
+    background-color: rgba(169, 190, 177, .085);
+    border-color: rgba(181, 203, 190, .38);
+    color: #e4e8df;
+}
+
+.map-game .choice-list button:hover {
+    background-color: rgba(17, 24, 22, .98)
+}
+
+.map-game button:focus-visible, .map-game a:focus-visible,
+.map-game select:focus-visible, .settings-shell button:focus-visible {
+    outline-width: 1px;
+    outline-color: #c3cdbb;
+    border-color: rgba(195, 205, 187, .55);
+    color: #eef0e7;
+}
+
+.map-game .journal-tabs button {
+    color: #91a298;
+    border-color: rgba(151, 177, 165, .2)
+}
+
+.map-game .journal-tabs button[aria-selected="true"] {
+    color: #d7c19b;
+    border-color: #bfa47a
+}
+
+.map-game .journal-entry {
+    background: rgba(148, 169, 153, .035);
+    border-left-color: #7f9585
+}
+
+.map-game .journal-entry b {
+    color: #c9b38c
+}
+
+.map-game .terminal-label {
+    color: #a0b4a8 !important
+}
+
+.map-game .minigame-stage {
+    background: #050809;
+    border-color: rgba(151, 177, 165, .15)
+}
+
+.settings-shell .scene-background {
+    filter: brightness(.55) saturate(.72) contrast(1.08)
+}
+
+.settings-shell .setting-category {
+    background: linear-gradient(180deg, rgba(7, 11, 12, .88), rgba(4, 8, 9, .78));
+    border-color: rgba(151, 177, 165, .13);
+    border-top-color: rgba(191, 164, 122, .38);
+    box-shadow: none;
+}
+
+.settings-shell .setting-category::after {
+    background: rgba(191, 164, 122, .45)
+}
+
+.settings-shell .setting-category header {
+    border-bottom-color: rgba(151, 177, 165, .16)
+}
+
+.settings-shell .setting-category h2 {
+    color: #d7dcd7
+}
+
+.settings-shell .setting-category__index {
+    color: #b29c79
+}
+
+.settings-shell .setting-category header p {
+    color: #81958b
+}
+
+.settings-shell .binding-groups h3 {
+    color: #a3b4a9
+}
+
+.settings-shell .binding-groups section > div {
+    color: #c0cac2;
+    border-bottom-color: rgba(151, 177, 165, .1)
+}
+
+.settings-shell .binding-groups button, .settings-shell .control-actions button {
+    background: rgba(151, 177, 165, .035);
+    border-color: rgba(151, 177, 165, .24);
+    color: #becac2;
+    box-shadow: none;
+}
+
+.settings-shell .binding-groups button:hover, .settings-shell .control-actions button:hover {
+    background: rgba(151, 177, 165, .1);
+    border-color: rgba(181, 203, 190, .4);
+    color: #e4e8df;
+}
+
+.settings-shell .binding-groups button.is-capturing {
+    color: #e0c494;
+    border-color: #bfa47a;
+    background: rgba(191, 164, 122, .07)
+}
+
+.settings-shell .control-actions p, .settings-shell .settings-pending {
+    color: #98aaa0
+}
+
+.settings-shell .audio-placeholders li {
+    color: #a2b1a8;
+    border-bottom-color: rgba(151, 177, 165, .1)
+}
+
+.settings-shell .audio-placeholders small, .settings-shell .setting-category__status {
+    color: #82958a
+}
+
+.settings-shell .inner-title {
+    color: #dadfd7
+}
+
+.settings-shell .inner-subtitle {
+    color: #93a59b
+}
+
+.settings-shell .back-control {
+    color: #c0cac2;
+    border-color: rgba(151, 177, 165, .24)
+}
+
+.settings-shell {
+    animation: none;
+    transition: none
+}
+
+.ui-layer[data-motion="closing"], [data-status-hud][data-motion="closing"] {
+    pointer-events: none
+}
+
+body.has-modal .location-hud {
+    visibility: hidden
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .map-game *, .settings-shell * {
+        transition-duration: .001ms !important
+    }
+}
+
+.difficulty-options {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center
+}
+
+.difficulty-options button {
+    flex: 1;
+    min-width: 150px;
+    padding: 16px 12px !important;
+    background: #151c20;
+    border: 1px solid #5e594d;
+    color: #d2c8b6;
+    text-align: left;
+    font: inherit;
+    cursor: pointer
+}
+
+.difficulty-options button small {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #aba89d
+}
+
+.difficulty-options button[aria-pressed="true"] {
+    border-color: #c5a86c;
+    background: #38352a;
+    box-shadow: inset 3px 0 #c5a86c
+}
+
+.difficulty-options button:focus-visible {
+    outline: 2px solid #e3c68c;
+    outline-offset: 3px
+}
+
+.difficulty-category {
+    grid-column: 1/-1
+}
+
+.difficulty-category p {
+    font-size: 13px;
+    color: #a9a395
+}
+
+.map-game .panel-large, .map-game .dialogue-box, .map-game .choice-dialogue,
+.map-game .pause-panel, .map-game .confirm-panel, .map-game .ending-panel,
+.settings-shell .setting-category {
+    background-image: url('./panel-grain.svg'), linear-gradient(115deg, rgba(170, 156, 116, .055), transparent 43%), linear-gradient(180deg, rgba(17, 24, 24, .98), rgba(6, 11, 13, .98));
+    background-size: 180px 180px, 100% 100%, 100% 100%;
+    box-shadow: inset 0 1px rgba(232, 216, 177, .07), inset 0 -1px rgba(0, 0, 0, .5), 0 16px 42px #0005;
+}
+
+.map-game .location-hud, .map-game .task-hud, .map-game .key-guide {
+    background-image: url('./panel-grain.svg'), linear-gradient(110deg, rgba(18, 28, 28, .96), rgba(5, 11, 13, .93));
+    background-size: 180px 180px, 100% 100%;
+}
+
+.map-game .puzzle-content, .map-game .puzzle-tutorial, .map-game .journal-entry {
+    background-image: url('./panel-grain.svg');
+    background-size: 180px 180px;
+}
+
+.map-game .location-hud {
+    width: max-content;
+    min-width: 20.5rem;
+    max-width: calc(100vw - 3.5rem)
+}
+
+.map-game .location-hud small, .map-game .location-hud > strong, .map-game .location-hud > span {
+    white-space: nowrap
+}
+
+.map-game .location-hud > span {
+    align-items: center
+}
+
+.map-game .dialogue-skip {
+    position: absolute;
+    z-index: 4;
+    bottom: 16px;
+    left: calc(7.5% + 30px);
+    padding: 7px 12px;
+    color: #bfb69e;
+    background: #111c1ee8;
+    border: 1px solid #91836870;
+    font-size: 12px;
+    letter-spacing: .08em;
+    cursor: pointer
+}
+
+.map-game .dialogue-box footer {
+    padding-left: 140px;
+    min-height: 30px
+}
+
+.map-game .dialogue-skip:hover {
+    color: #eee0b9;
+    border-color: #c2a676;
+    background: #26312d
+}
+
+.map-game .game-save-panel {
+    width: min(90vw, 660px);
+    max-height: 88vh;
+    overflow: auto
+}
+
+.map-game #save-game-note, .map-game #save-game-status {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #c1c8bc
+}
+
+.map-game #save-game-status {
+    min-height: 1.7em;
+    color: #d4be90
+}
+
+.map-game #game-save-slots {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px
+}
+
+.map-game .game-save-slot {
+    display: grid;
+    grid-template-columns:1fr auto;
+    gap: 8px 18px;
+    padding: 16px;
+    border: 1px solid #879c913b;
+    background: linear-gradient(100deg, #889c9210, transparent)
+}
+
+.map-game .game-save-slot strong {
+    font-size: 16px;
+    font-weight: 500;
+    color: #dcc69d
+}
+
+.map-game .game-save-slot p {
+    grid-column: 1;
+    margin: 0;
+    color: #a2b4aa;
+    font-size: 12px;
+    line-height: 1.7
+}
+
+.map-game .game-save-slot button {
+    grid-column: 2;
+    grid-row: 1/3;
+    align-self: center;
+    padding: 10px 15px;
+    border: 1px solid #aa947c80;
+    color: #d8c5a3;
+    background: #171f20;
+    cursor: pointer
+}
+
+.map-game .game-save-slot button:hover {
+    background: #30372f;
+    border-color: #d0bb90
+}
+
+.map-game .minigame-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center
+}
+
+.map-game .minigame-actions button {
+    white-space: nowrap
+}
+
+.map-game .pause-panel {
+    max-height: 90vh;
+    overflow: auto
+}
+
+@media (max-width: 900px) {
+    .map-game .location-hud {
+        min-width: 19rem;
+        font-size: .9rem
+    }
+
+    .map-game .dialogue-skip {
+        left: calc(7.5% + 20px)
+    }
+
+    .map-game .minigame-actions {
+        gap: 6px
+    }
+
+    .map-game .minigame-actions button {
+        padding: 8px
+    }
+}
+
+.map-game .media-skip {
+    margin-left: 12px;
+    padding: 14px 20px;
+    color: #cfc0a0;
+    background: #192325;
+    border: 1px solid #aa947c80;
+    cursor: pointer
+}
+
+.map-game .panel-large, .map-game .pause-panel, .map-game .confirm-panel, .map-game .ending-panel {
+    position: relative
+}
+
+.map-game :is(.panel-large,.pause-panel,.confirm-panel,.ending-panel,.dialogue-box,.location-hud,.task-hud)::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    pointer-events: none;
+    border: 1px solid rgba(182, 174, 146, .08);
+    background: linear-gradient(#b5a17a99, #b5a17a99) left top/23px 1px no-repeat,
+    linear-gradient(#b5a17a99, #b5a17a99) left top/1px 15px no-repeat,
+    linear-gradient(#b5a17a99, #b5a17a99) right top/23px 1px no-repeat,
+    linear-gradient(#b5a17a99, #b5a17a99) right top/1px 15px no-repeat,
+    linear-gradient(#b5a17a77, #b5a17a77) left bottom/23px 1px no-repeat,
+    linear-gradient(#b5a17a77, #b5a17a77) left bottom/1px 15px no-repeat,
+    linear-gradient(#b5a17a77, #b5a17a77) right bottom/23px 1px no-repeat,
+    linear-gradient(#b5a17a77, #b5a17a77) right bottom/1px 15px no-repeat;
+}
+
+.map-game :is(.panel-large,.pause-panel,.confirm-panel,.ending-panel,.dialogue-box)::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 188px;
+    height: 20px;
+    background: url('./lunar-engraving.svg') center/contain no-repeat;
+    pointer-events: none;
+    opacity: .8;
+}
+
+.map-game :is(.location-hud,.task-hud)::after {
+    content: "";
+    position: absolute;
+    right: 6px;
+    top: 20px;
+    bottom: 20px;
+    width: 3px;
+    pointer-events: none;
+    background: repeating-linear-gradient(180deg, #bfa47a66 0 1px, transparent 1px 7px);
+    opacity: .6;
+}
+
+.map-game .panel-heading {
+    position: relative;
+    border-bottom-style: double;
+    border-bottom-width: 3px;
+    border-bottom-color: #a4987540
+}
+
+.map-game .panel-heading::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    transform: rotate(45deg);
+    background: #bda477;
+    box-shadow: 7px -7px 0 -1px #bda47788;
+    pointer-events: none
+}
+
+.map-game .game-save-slot {
+    position: relative;
+    box-shadow: inset 3px 0 #bca37850, inset 0 1px #e5ce9e08
+}
+
+.map-game .game-save-slot::after {
+    content: "";
+    position: absolute;
+    left: 9px;
+    bottom: 7px;
+    width: 24px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, #bfa47a70 0 1px, transparent 1px 4px);
+    pointer-events: none
+}
+
+.map-game .game-save-slot strong::before {
+    content: "";
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin-right: 10px;
+    border: 1px solid #bfa47a99;
+    border-radius: 50%;
+    box-shadow: inset 3px 0 #bfa47a55;
+    vertical-align: baseline
+}
+
+.map-game .journal-entry {
+    border-left-width: 2px;
+    box-shadow: inset 1px 0 #dbca9f20
+}
+
+.map-game .evidence-cards details {
+    border-left: 2px solid #9b8b6555;
+    background: linear-gradient(110deg, #ada38309, transparent 70%), url('./panel-grain.svg'), #132126
+}
+
+.map-game .evidence-cards details[open] {
+    border-left-color: #c0a572
+}
+
+.map-game .puzzle-tutorial {
+    border-top: 1px solid #b59d7366;
+    border-bottom: 1px solid #b59d7344;
+    box-shadow: inset 3px 0 #b59d7329
+}
+
+.map-game .pause-panel :is(button,a) {
+    position: relative
+}
+
+.map-game .pause-panel :is(button,a)::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    height: 4px;
+    width: 4px;
+    border: 1px solid #bfa47a88;
+    transform: translateY(-50%) rotate(45deg);
+    opacity: 0;
+    transition: opacity .15s
+}
+
+.map-game .pause-panel :is(button,a):is(:hover,:focus-visible)::before {
+    opacity: 1
+}
+
+.map-game .game-save-slot button, .map-game .dialogue-skip {
+    box-shadow: inset 0 1px #e7d4a91a, inset 0 -2px #0003
+}
+
+@media (max-width: 900px) {
+    .map-game :is(.panel-large,.dialogue-box)::after {
+        width: 132px;
+        opacity: .6
+    }
+}
+
+.map-game .dialogue-skip {
+    position: fixed;
+    left: auto;
+    bottom: auto;
+    right: 28px;
+    top: 24px;
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    padding: 10px 14px
+}
+
+.map-game .dialogue-skip svg {
+    width: 18px;
+    height: 14px;
+    fill: currentColor
+}
+
+.map-game .dialogue-box footer {
+    padding-left: 0
+}
+
+.map-game .media-skip {
+    position: absolute;
+    top: 24px;
+    right: 110px
+}

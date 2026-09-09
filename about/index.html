@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030506">
+    <link rel="icon" href="../img/favicon.svg">
+    <title>月尽时 | 开发成员档案</title>
+    <link rel="stylesheet" href="../shared/css/base.css">
+    <link rel="stylesheet" href="./css/about.css">
+    <script src="../shared/js/common.js" defer></script>
+    <script src="./js/team-data.js" defer></script>
+    <script src="./js/about.js" defer></script>
+</head>
+<body>
+<main class="page-shell about-shell" id="about-shell">
+    <div class="scene-background" aria-hidden="true"></div>
+    <div class="ambient-layer" aria-hidden="true">
+        <span class="ambient-dust"></span>
+        <span class="scanlines"></span>
+        <span class="film-grain"></span>
+    </div>
+
+    <header class="archive-header">
+        <div class="archive-topbar">
+            <section class="team-branding" aria-label="六神无组团队标识">
+                <img class="team-branding__logo" src="../img/lswzlogo.jpg" alt="六神无组团队 Logo">
+                <img class="team-branding__name" src="../img/lswzname.png" alt="六神无组">
+            </section>
+
+            <div class="archive-controls">
+                <p class="archive-clock">
+                    <span>SYSTEM TIME</span>
+                    <time id="system-time" datetime="00:00:00">00:00:00</time>
+                </p>
+                <button class="back-control archive-return" id="back-button" type="button">
+                    <span>返回</span>
+                    <small>BACK // MAIN MENU</small>
+                </button>
+            </div>
+        </div>
+
+        <section class="archive-heading" aria-labelledby="archive-title">
+            <div class="archive-heading__title">
+                <p>PROJECT // MOON WITHOUT RETURN</p>
+                <h1 id="archive-title">开发成员档案</h1>
+                <span>DEVELOPMENT ARCHIVE</span>
+            </div>
+
+            <dl class="team-information">
+                <div>
+                    <dt>TEAM</dt>
+                    <dd>六神无组</dd>
+                </div>
+                <div>
+                    <dt>MEMBERS</dt>
+                    <dd id="member-count">06</dd>
+                </div>
+                <div>
+                    <dt>ARCHIVE</dt>
+                    <dd>DEVELOPMENT</dd>
+                </div>
+            </dl>
+        </section>
+    </header>
+
+    <section class="member-archive" aria-labelledby="member-archive-title">
+        <header class="member-archive__header">
+            <div>
+                <p>PERSONNEL DATABASE // READ ONLY</p>
+                <h2 id="member-archive-title">项目成员记录</h2>
+            </div>
+            <span>RECORDS // <strong id="record-count">06</strong></span>
+        </header>
+
+        <div class="member-grid" id="member-grid"></div>
+        <p class="archive-message" id="archive-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <footer class="archive-footer">
+        <img class="archive-game-logo" src="../img/logo.png" alt="Moon Without Return">
+        <p>每一个被构筑的世界，都留下构筑者的痕迹。</p>
+        <span>ARCHIVE NODE // DEVELOPMENT</span>
+    </footer>
+</main>
+
+<section class="member-detail" id="member-detail" role="dialog" aria-modal="true" aria-labelledby="detail-name" hidden>
+    <article class="member-detail__panel">
+        <header class="member-detail__header">
+            <p id="detail-file">PERSONNEL FILE // 00</p>
+            <button class="member-detail__close" id="detail-close" type="button" aria-label="关闭成员详情">
+                <span>关闭</span>
+                <small>CLOSE</small>
+            </button>
+        </header>
+
+        <div class="member-detail__body">
+            <figure class="member-detail__portrait-frame">
+                <img class="member-detail__portrait" id="detail-avatar" src="../img/ren.jpg" alt="">
+            </figure>
+
+            <section class="member-detail__information">
+                <span class="detail-label">NAME</span>
+                <h2 id="detail-name"></h2>
+
+                <span class="detail-label">ROLE</span>
+                <p class="member-detail__role" id="detail-role"></p>
+
+                <span class="detail-label">PROFILE // 个人经历</span>
+                <p class="member-detail__description" id="detail-description"></p>
+            </section>
+        </div>
+
+        <footer class="member-detail__footer">
+            <span>DEVELOPMENT ARCHIVE // FULL RECORD</span>
+            <span>STATUS // ACTIVE</span>
+        </footer>
+    </article>
+</section>
+</body>
+</html>
