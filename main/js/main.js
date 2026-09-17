@@ -1,6 +1,7 @@
 "use strict";
 
 
+
 const mainShell = document.getElementById("main-shell");
 const menuButtons = [...document.querySelectorAll(".menu-item")];
 const teamBrand = document.getElementById("team-brand");
@@ -10,18 +11,23 @@ const menuFeedback = document.getElementById("menu-feedback");
 const operatorName = document.getElementById("operator-name");
 
 
+
 const menuItems = [
     "newGame",
     "loadGame",
     "achievements",
+    "flowchart",
     "about",
     "settings"
 ];
 
 
+
 let selectedMenuIndex = 0;
 let feedbackTimer = 0;
 let isInitializingMission = false;
+
+
 
 
 function selectMenuItem(index, shouldFocus = false) {
@@ -58,6 +64,7 @@ function activateSelectedMenuItem() {
 }
 
 
+
 function handleMenuKeyboard(event) {
     const key = event.key.toLowerCase();
 
@@ -85,6 +92,7 @@ function handleMenuKeyboard(event) {
 }
 
 
+
 function bindMenuPointerNavigation() {
     menuButtons.forEach((button, index) => {
         button.addEventListener("mouseenter", () => selectMenuItem(index));
@@ -94,6 +102,7 @@ function bindMenuPointerNavigation() {
 }
 
 
+
 function startNewGame() {
     if (isInitializingMission) {
         return;
@@ -101,6 +110,7 @@ function startNewGame() {
 
     isInitializingMission = true;
     playMenuConfirmSound();
+    MoonMenuBgm.stop();
     showMenuFeedback("INITIALIZING NEW MISSION", "正在建立新的任务记录……", 1700);
 
     window.setTimeout(() => {
@@ -108,6 +118,7 @@ function startNewGame() {
         MoonSystem.navigateTo("../game/index.html?new=1&entry=chapter1");
     }, 850);
 }
+
 
 
 function activateMenuAction(action) {
@@ -118,6 +129,9 @@ function activateMenuAction(action) {
         case "loadGame":
             playMenuConfirmSound();
             MoonSystem.navigateTo("../save/index.html");
+            break;
+        case "flowchart":
+            openFlowchart();
             break;
         case "achievements":
             playMenuConfirmSound();
@@ -132,6 +146,32 @@ function activateMenuAction(action) {
         default:
             break;
     }
+}
+
+function pickFurthestSave() {
+    const candidates = [{slot: "auto", data: MoonStorage.loadGame("auto")}, ...[1, 2, 3].map(id => ({slot: String(id), data: MoonStorage.loadGame(id)}))];
+    const lineageCount = save => {
+        const lineage = save && save.flags && save.flags.log_id;
+        if (!lineage) return 0;
+        try {
+            const rows = JSON.parse(localStorage.getItem("moon_log_" + lineage) || "[]");
+            return new Set(rows.map(row => row && row.node).filter(Boolean)).size;
+        } catch (error) {
+            return 0;
+        }
+    };
+    const score = save => save ? (save.chapter || 0) * 100000 + (save.day || 0) * 100 + (save.playTime || 0) / 60 + (save.evidence || []).length * 5 + (save.completedTasks || []).length * 3 + lineageCount(save) * 8 : -Infinity;
+    return candidates.reduce((best, current) => score(current.data) > score(best.data) ? current : best, {slot: "", data: null});
+}
+function openFlowchart() {
+    playMenuConfirmSound();
+    const best = pickFurthestSave();
+    const params = new URLSearchParams({flowchart: "1", story: "0"});
+    if (best && best.data) {
+        params.set("load", best.slot);
+        params.set("flowlineage", best.data.flags?.log_id || "pending");
+    }
+    MoonSystem.navigateTo("../game/index.html?" + params.toString());
 }
 
 function openSettings() {
@@ -158,9 +198,11 @@ function showMenuFeedback(primary, secondary, duration = 1800) {
 }
 
 
+
 function initializeOperator() {
     operatorName.textContent = MoonSystem.getCurrentOperator();
 }
+
 
 
 function initializeEntryAnimation() {
@@ -168,14 +210,19 @@ function initializeEntryAnimation() {
 }
 
 
+
 function playMenuMoveSound() {
+
 }
 
 function playMenuConfirmSound() {
+
 }
 
 function playBackSound() {
+
 }
+
 
 
 function bindEventListeners() {
@@ -185,12 +232,14 @@ function bindEventListeners() {
 }
 
 
+
 function initialize() {
     selectMenuItem(0);
     initializeOperator();
     MoonSystem.initializeSystemClock();
     initializeEntryAnimation();
     bindEventListeners();
+    MoonMenuBgm.start();
 }
 
 initialize();

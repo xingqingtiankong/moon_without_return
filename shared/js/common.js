@@ -1,6 +1,14 @@
 "use strict";
 
 (function createMoonSystem() {
+    function isEmbedded() {
+        try {
+            return window.self !== window.top;
+        } catch (error) {
+            return true;
+        }
+    }
+
     function updateSystemClock(clockElement) {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, "0");
@@ -45,6 +53,14 @@
 
         document.body.classList.add("is-leaving");
         window.setTimeout(() => {
+            if (isEmbedded()) {
+                window.parent.postMessage({
+                    type: "moon-menu-shell:navigate",
+                    url: relativePath
+                }, "*");
+                return;
+            }
+
             window.location.href = relativePath;
         }, 300);
     }
@@ -74,6 +90,7 @@
     }
 
     function playBackSound() {
+
     }
 
     window.MoonSystem = Object.freeze({

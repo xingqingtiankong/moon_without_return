@@ -1,5 +1,12 @@
 
+
+
+
 :root {
+    --display-scale: 1;
+    --display-brightness: 1;
+    --display-scanlines: 1;
+    --display-grain: 1;
     color-scheme: dark;
     --void: #020405;
     --surface: rgba(7, 13, 16, 0.7);
@@ -33,6 +40,7 @@ body {
 body {
     min-width: 320px;
     color: var(--text-main);
+    font-size: calc(16px * var(--display-scale));
 }
 
 button,
@@ -73,12 +81,16 @@ a:focus-visible {
     transition: opacity 320ms ease,
     filter 320ms ease;
     animation: pageReveal 900ms ease both;
+    filter: brightness(var(--display-brightness));
 }
 
 body.is-leaving .page-shell {
     opacity: 0;
     filter: blur(1.5px);
 }
+
+
+
 
 
 .scene-background {
@@ -137,7 +149,7 @@ body.is-leaving .page-shell {
 }
 
 .scanlines {
-    opacity: 0.045;
+    opacity: calc(0.045 * var(--display-scanlines));
     background: repeating-linear-gradient(
             180deg,
             transparent 0,
@@ -149,7 +161,7 @@ body.is-leaving .page-shell {
 
 .film-grain {
     inset: -35% !important;
-    opacity: 0.028;
+    opacity: calc(0.028 * var(--display-grain));
     background-image: repeating-radial-gradient(
             circle at 24% 41%,
             transparent 0 1px,
@@ -159,6 +171,16 @@ body.is-leaving .page-shell {
     background-size: 10px 12px;
     animation: sharedGrain 1s steps(2, end) infinite;
 }
+
+body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+}
+
+
+
 
 
 .game-mark {
@@ -209,6 +231,9 @@ body.is-leaving .page-shell {
 .corner-hud__value {
     color: rgba(181, 204, 202, 0.58);
 }
+
+
+
 
 
 .inner-header {
@@ -314,6 +339,9 @@ body.is-leaving .page-shell {
     color: rgba(226, 235, 233, 0.96);
     text-shadow: 0 0 0.75rem rgba(158, 207, 209, 0.24);
 }
+
+
+
 
 
 @keyframes pageReveal {

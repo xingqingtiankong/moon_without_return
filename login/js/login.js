@@ -1,6 +1,7 @@
 "use strict";
 
 
+
 const app = document.getElementById("app");
 const startScreen = document.getElementById("start-screen");
 const startTrigger = document.getElementById("start-trigger");
@@ -25,6 +26,7 @@ const feedbackDetail = document.getElementById("feedback-detail");
 const authResult = document.getElementById("auth-result");
 const systemTime = document.getElementById("system-time");
 const linkStatus = document.getElementById("link-status");
+
 
 
 const AppState = {
@@ -52,10 +54,16 @@ const UI_COPY = {
 };
 
 
+
 const STORAGE_KEYS = {
     users: "moon_without_return_users",
     currentUser: "moon_without_return_current_user"
 };
+
+
+
+
+
 
 function loadUsers() {
     try {
@@ -100,6 +108,7 @@ function saveCurrentUser(username) {
 }
 
 
+
 function enterAuthenticationScreen() {
     if (AppState.screen !== "start" || AppState.isTransitioning) {
         return;
@@ -133,6 +142,7 @@ function handleStartKey(event) {
 
     enterAuthenticationScreen();
 }
+
 
 
 function setFormInteractive(form, isInteractive) {
@@ -171,6 +181,7 @@ function switchAuthMode(mode, options = {}) {
 }
 
 
+
 function handleLogin(event) {
     event.preventDefault();
 
@@ -206,6 +217,7 @@ function handleLogin(event) {
 
     completeAuthentication(matchingUser.username);
 }
+
 
 
 function handleRegister(event) {
@@ -257,6 +269,7 @@ function handleRegister(event) {
         switchAuthMode("login", {preserveFeedback: true});
     }, 1150);
 }
+
 
 
 function normalizeUsername(username) {
@@ -338,6 +351,7 @@ function markFieldInvalid(field) {
 }
 
 
+
 function showFeedback(type, code, message, detail) {
     feedback.dataset.type = type;
     feedbackCode.textContent = code;
@@ -364,6 +378,7 @@ function clearFieldError(event) {
 }
 
 
+
 function completeAuthentication(username) {
     AppState.isSubmitting = true;
     AppState.screen = "authenticated";
@@ -383,6 +398,7 @@ function completeAuthentication(username) {
 }
 
 
+
 function updateSystemClock() {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, "0");
@@ -395,22 +411,28 @@ function updateSystemClock() {
 }
 
 
+
 function playConfirmSound() {
+
 }
 
 function playErrorSound() {
+
 }
 
 function playStartSound() {
+
 }
+
 
 
 function enterGame() {
     document.dispatchEvent(new CustomEvent("moonWithoutReturn:enterGame", {
         detail: {username: normalizeUsername(loginUsername.value)}
     }));
-    window.location.href = "../main/index.html";
+    window.location.href = "../menu/index.html#/main";
 }
+
 
 
 function bindEventListeners() {
@@ -429,6 +451,7 @@ function bindEventListeners() {
         authTerminal.classList.remove("has-error");
     });
 }
+
 
 
 function initialize() {

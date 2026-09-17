@@ -1,4 +1,7 @@
 
+
+
+
 :root {
     color-scheme: dark;
     --ink: #05080a;
@@ -71,6 +74,9 @@ input:focus-visible {
 }
 
 
+
+
+
 .scene-background {
     position: absolute;
     z-index: -4;
@@ -120,6 +126,9 @@ input:focus-visible {
     background: linear-gradient(90deg, rgba(0, 3, 5, 0.38) 0%, rgba(0, 2, 4, 0.3) 58%, rgba(0, 1, 2, 0.52) 100%),
     linear-gradient(180deg, rgba(0, 2, 3, 0.28), rgba(0, 1, 2, 0.12) 48%, rgba(0, 1, 2, 0.55));
 }
+
+
+
 
 
 .ambient-layer,
@@ -174,6 +183,9 @@ input:focus-visible {
 }
 
 
+
+
+
 .start-logo,
 .auth-logo {
     display: block;
@@ -203,6 +215,9 @@ input:focus-visible {
     opacity: 1;
     filter: drop-shadow(0 0 0.7rem rgba(215, 188, 137, 0.4)) drop-shadow(0 0 1.7rem rgba(173, 217, 220, 0.22));
 }
+
+
+
 
 
 .game-main,
@@ -365,6 +380,9 @@ input:focus-visible {
 .game-shell.is-transitioning .philosophy-copy {
     transform: translateY(0.75rem);
 }
+
+
+
 
 
 .auth-screen {
@@ -543,6 +561,9 @@ input:focus-visible {
 }
 
 
+
+
+
 .terminal-frame {
     position: absolute;
     z-index: 1;
@@ -588,6 +609,9 @@ input:focus-visible {
     box-shadow: 0 0 0.5rem rgba(132, 204, 211, 0.78);
     animation: nodePulse 4.6s ease-in-out infinite;
 }
+
+
+
 
 
 .terminal-field {
@@ -782,6 +806,9 @@ input:focus-visible {
 }
 
 
+
+
+
 .system-hud {
     position: absolute;
     z-index: 10;
@@ -872,6 +899,9 @@ input:focus-visible {
     border-right: 1px solid rgba(144, 193, 196, 0.36);
     border-bottom: 1px solid rgba(144, 193, 196, 0.36);
 }
+
+
+
 
 
 .system-feedback {
@@ -982,6 +1012,9 @@ input:focus-visible {
 
 
 
+
+
+
 @keyframes backgroundBreath {
     0% {
         opacity: 0.94;
@@ -1063,6 +1096,9 @@ input:focus-visible {
         transform: translateX(100%);
     }
 }
+
+
+
 
 
 @media (max-width: 1100px) {

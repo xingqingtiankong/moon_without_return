@@ -386,6 +386,7 @@
         return door ? {...door.spawn} : {x: 836, y: 600};
     }
 
+
     let configHash = 2166136261;
     for (const char of JSON.stringify({
         MAP_SIZE,

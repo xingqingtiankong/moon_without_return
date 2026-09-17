@@ -1,5 +1,7 @@
 "use strict";
 
+
+
 const aboutShell = document.getElementById("about-shell");
 const memberGrid = document.getElementById("member-grid");
 const memberCount = document.getElementById("member-count");
@@ -13,12 +15,16 @@ const detailName = document.getElementById("detail-name");
 const detailRole = document.getElementById("detail-role");
 const detailDescription = document.getElementById("detail-description");
 
+
+
 const teamMembers = Array.isArray(window.MoonTeamData)
     ? window.MoonTeamData
     : [];
 
 let activeMemberTrigger = null;
 let detailCloseTimer = 0;
+
+
 
 function createTextElement(tagName, className, text) {
     const element = document.createElement(tagName);
@@ -94,6 +100,8 @@ function renderMembers() {
     }
 }
 
+
+
 function openMemberDetail(index, trigger) {
     const member = teamMembers[index];
 
@@ -143,6 +151,8 @@ function handleDetailBackdrop(event) {
     }
 }
 
+
+
 function handleKeyboardNavigation(event) {
     if (event.key !== "Escape") {
         return;
@@ -162,9 +172,13 @@ function initializeReturnNavigation() {
     MoonSystem.bindBackButton();
 }
 
+
+
 function initializeEntryAnimation() {
     window.requestAnimationFrame(() => aboutShell.classList.add("is-ready"));
 }
+
+
 
 function bindEventListeners() {
     detailClose.addEventListener("click", closeMemberDetail);
@@ -172,6 +186,8 @@ function bindEventListeners() {
     document.addEventListener("keydown", handleKeyboardNavigation);
     initializeReturnNavigation();
 }
+
+
 
 function initialize() {
     renderMembers();

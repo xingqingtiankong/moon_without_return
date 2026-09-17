@@ -7,6 +7,10 @@
     const SLOT_KEY = (slot) => `${PREFIX}save_v2_slot_${slot}`;
     const SETTINGS_VERSION = 1;
     const SAVE_VERSION = 3;
+    const DEFAULT_MASTER_VOLUME = 0.4;
+    const DEFAULT_MUSIC_VOLUME = 1;
+    const DEFAULT_SFX_VOLUME = 1;
+    const DEFAULT_DISPLAY = Object.freeze({scale: 1, brightness: 1, scanlines: true, grain: true, reducedMotion: false});
 
     const DEFAULT_BINDINGS = Object.freeze({
         exploration: Object.freeze({
@@ -48,13 +52,19 @@
     function loadSettings() {
         const parsed = safeParse(localStorage.getItem(SETTINGS_KEY));
         if (!parsed || parsed.schemaVersion !== SETTINGS_VERSION || !isBindings(parsed.bindings)) {
-            return {schemaVersion: SETTINGS_VERSION, bindings: clone(DEFAULT_BINDINGS), difficulty: "normal"};
+            return {
+                schemaVersion: SETTINGS_VERSION,
+                bindings: clone(DEFAULT_BINDINGS),
+                difficulty: "normal",
+                masterVolume: DEFAULT_MASTER_VOLUME,
+                musicVolume: DEFAULT_MUSIC_VOLUME,
+                sfxVolume: DEFAULT_SFX_VOLUME, ...clone(DEFAULT_DISPLAY)
+            };
         }
-        return {
-            schemaVersion: SETTINGS_VERSION,
-            bindings: clone(parsed.bindings),
-            difficulty: ["easy", "normal", "hard"].includes(parsed.difficulty) ? parsed.difficulty : "normal"
-        };
+        const masterVolume = Number.isFinite(parsed.masterVolume) ? Math.max(0, Math.min(1, parsed.masterVolume)) : DEFAULT_MASTER_VOLUME;
+        const musicVolume = Number.isFinite(parsed.musicVolume) ? Math.max(0, Math.min(1, parsed.musicVolume)) : DEFAULT_MUSIC_VOLUME;
+        const sfxVolume = Number.isFinite(parsed.sfxVolume) ? Math.max(0, Math.min(1, parsed.sfxVolume)) : DEFAULT_SFX_VOLUME;
+        return {schemaVersion: SETTINGS_VERSION, bindings: clone(parsed.bindings), difficulty: ["easy", "normal", "hard"].includes(parsed.difficulty) ? parsed.difficulty : "normal", masterVolume, musicVolume, sfxVolume, scale: Number.isFinite(parsed.scale) ? Math.max(.85, Math.min(1.15, parsed.scale)) : 1, brightness: Number.isFinite(parsed.brightness) ? Math.max(.7, Math.min(1.3, parsed.brightness)) : 1, scanlines: parsed.scanlines !== false, grain: parsed.grain !== false, reducedMotion: parsed.reducedMotion === true};
     }
 
     function saveSettings(settings) {
@@ -62,7 +72,13 @@
         const clean = {
             schemaVersion: SETTINGS_VERSION,
             bindings: clone(settings.bindings),
-            difficulty: ["easy", "normal", "hard"].includes(settings.difficulty) ? settings.difficulty : "normal"
+            difficulty: ["easy", "normal", "hard"].includes(settings.difficulty) ? settings.difficulty : "normal",
+            masterVolume: Number.isFinite(settings.masterVolume) ? Math.max(0, Math.min(1, settings.masterVolume)) : DEFAULT_MASTER_VOLUME,
+            musicVolume: Number.isFinite(settings.musicVolume) ? Math.max(0, Math.min(1, settings.musicVolume)) : DEFAULT_MUSIC_VOLUME,
+            sfxVolume: Number.isFinite(settings.sfxVolume) ? Math.max(0, Math.min(1, settings.sfxVolume)) : DEFAULT_SFX_VOLUME,
+            scale: Number.isFinite(settings.scale) ? Math.max(.85, Math.min(1.15, settings.scale)) : 1,
+            brightness: Number.isFinite(settings.brightness) ? Math.max(.7, Math.min(1.3, settings.brightness)) : 1,
+            scanlines: settings.scanlines !== false, grain: settings.grain !== false, reducedMotion: settings.reducedMotion === true
         };
         try {
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(clean));
@@ -75,7 +91,7 @@
     }
 
     function resetSettings() {
-        const settings = {schemaVersion: SETTINGS_VERSION, bindings: clone(DEFAULT_BINDINGS), difficulty: "normal"};
+        const settings = {schemaVersion: SETTINGS_VERSION, bindings: clone(DEFAULT_BINDINGS), difficulty: "normal", masterVolume: DEFAULT_MASTER_VOLUME, musicVolume: DEFAULT_MUSIC_VOLUME, sfxVolume: DEFAULT_SFX_VOLUME, ...clone(DEFAULT_DISPLAY)};
         settings.difficulty = loadSettings().difficulty;
         saveSettings(settings);
         return settings;
@@ -116,8 +132,40 @@
             playTime: 0,
             settingsVersion: SETTINGS_VERSION,
             chapterComplete: false,
-            savedAt: null
+            savedAt: null,
+            snapshot: null,
+            snapshotScene: null,
+            storyTitle: "",
+            storySummary: "",
+            chapterTitle: ""
         };
+    }
+
+    function cleanSaveText(value, maxLength) {
+        if (typeof value !== "string") return "";
+        return value
+            .replace(/[\u0000-\u001f\u007f]+/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, maxLength);
+    }
+
+    function normalizeSaveSnapshot(value) {
+        if (typeof value !== "string") return null;
+        const normalized = value.replace(/\s+/g, "");
+        if (normalized.length < 64 || normalized.length > 240000) return null;
+        return /^data:image\/(?:png|jpe?g|webp);base64,[A-Za-z0-9+/=]+$/i.test(normalized) ? normalized : null;
+    }
+
+    function normalizeSaveScene(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+        if (typeof value.mapId !== "string" || !/^[A-Za-z0-9_-]{2,32}$/.test(value.mapId)) return null;
+        if (["__proto__", "constructor", "prototype"].includes(value.mapId)) return null;
+        const x = Number.isFinite(value.x) ? Math.max(0, Math.min(1672, value.x)) : 755.4;
+        const y = Number.isFinite(value.y) ? Math.max(0, Math.min(941, value.y)) : 743.7;
+        const facingRow = Number.isFinite(value.facingRow) ? Math.max(0, Math.min(7, Math.floor(value.facingRow))) : 0;
+        const sprite = ["idle", "walk", "spacesuit"].includes(value.sprite) ? value.sprite : "idle";
+        return {mapId: value.mapId, x, y, facingRow, sprite};
     }
 
     function migrateSave(value) {
@@ -128,6 +176,11 @@
         const number = (v, min, max, fallback) => Number.isFinite(v) ? Math.max(min, Math.min(max, v)) : fallback;
         for (const key of ['node', 'checkpointId', 'configVersion']) if (id(value[key])) base[key] = value[key];
         if (value.schemaVersion !== 3) base.configVersion = 'legacy-unverified';
+        base.storyTitle = cleanSaveText(value.storyTitle, 72);
+        base.storySummary = cleanSaveText(value.storySummary, 160);
+        base.chapterTitle = cleanSaveText(value.chapterTitle, 48);
+        base.snapshot = normalizeSaveSnapshot(value.snapshot);
+        base.snapshotScene = normalizeSaveScene(value.snapshotScene);
         if (typeof value.currentMap === 'string' && /^(F0[0-5]|R0[1-9]|B0[1-5]|A0[2-7])$/.test(value.currentMap)) base.currentMap = value.currentMap;
         base.day = Math.floor(number(value.day, 1, 365, 1));
         base.mental_value = number(value.mental_value, 0, 100, 100);
@@ -178,6 +231,16 @@
             window.dispatchEvent(new CustomEvent("moon:game-saved", {detail: clone(value)}));
             return value;
         } catch (error) {
+            if (value.snapshot) {
+                const fallback = {...value, snapshot: null};
+                try {
+                    localStorage.setItem(key, JSON.stringify(fallback));
+                    window.dispatchEvent(new CustomEvent("moon:game-saved", {detail: clone(fallback)}));
+                    return fallback;
+                } catch (fallbackError) {
+                    console.warn("Unable to write save data without snapshot.", fallbackError);
+                }
+            }
             console.warn("Unable to write save data.", error);
             return false;
         }

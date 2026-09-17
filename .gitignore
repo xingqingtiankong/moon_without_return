@@ -1,0 +1,10 @@
+.idea/
+tmp/
+scale-captures/
+
+*.rar
+game/audio/adult-xing-video.mp4
+
+.DS_Store
+Thumbs.db
+desktop.ini

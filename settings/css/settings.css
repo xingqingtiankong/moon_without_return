@@ -1,4 +1,7 @@
 
+
+
+
 .settings-shell .scene-background {
     filter: brightness(0.4) saturate(0.6) contrast(1.1);
 }
@@ -135,7 +138,7 @@
     line-height: 1.7;
 }
 
-.audio-placeholders {
+.audio-controls {
     display: flex;
     flex-direction: column;
     gap: clamp(0.65rem, 1.2vh, 0.9rem);
@@ -144,22 +147,38 @@
     list-style: none;
 }
 
-.audio-placeholders li {
-    display: flex;
-    flex-direction: column;
-    gap: 0.16rem;
+.audio-control {
+    display: grid;
+    grid-template-columns: 5.2rem 1fr 3.2rem;
+    align-items: center;
+    gap: 0.8rem;
     padding-bottom: 0.42rem;
     border-bottom: 1px solid rgba(137, 177, 179, 0.08);
-    color: rgba(174, 193, 191, 0.52);
+    color: rgba(174, 193, 191, 0.68);
     font-size: clamp(0.53rem, 0.6vw, 0.7rem);
     letter-spacing: 0.12rem;
 }
 
-.audio-placeholders small {
-    color: rgba(130, 156, 156, 0.3);
-    font-size: 0.7em;
-    letter-spacing: 0.1rem;
+.audio-control input[type="range"] {
+    width: 100%;
+    accent-color: #d2a15e;
 }
+
+.audio-control output {
+    color: rgba(208, 222, 220, 0.78);
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    text-align: right;
+}
+
+.display-controls { display: grid; gap: .7rem; margin-top: 1.1rem; }
+.display-control { display: grid; grid-template-columns: 5.5rem 1fr 3rem; gap: .6rem; align-items: center; color: rgba(174,193,191,.68); font-size: .65rem; }
+.display-control input[type="range"] { width: 100%; accent-color: #d2a15e; }
+.display-control output { text-align: right; color: rgba(208,222,220,.78); font-family: "Cascadia Mono", monospace; }
+.display-toggle { grid-template-columns: 1fr 2.5rem; }
+.display-toggle input { display: none; }
+.display-toggle b { position: relative; height: 1rem; border: 1px solid rgba(153,201,204,.35); background: rgba(8,20,24,.7); }
+.display-toggle b::after { content: ""; position: absolute; width: .65rem; height: .65rem; left: .12rem; top: .1rem; background: #657675; transition: transform .2s, background .2s; }
+.display-toggle input:checked + b::after { transform: translateX(1.45rem); background: #d2a15e; }
 
 .settings-pending {
     grid-column: 1 / -1;
@@ -169,6 +188,17 @@
     font-size: clamp(0.42rem, 0.48vw, 0.57rem);
     letter-spacing: clamp(0.12rem, 0.22vw, 0.26rem);
     text-align: center;
+}
+
+.settings-shell.is-embedded .back-control {
+    position: fixed;
+    left: 0.8rem;
+    bottom: 0.8rem;
+    min-width: 9rem;
+    min-height: 3rem;
+    padding: 0.8rem 0.5rem;
+    z-index: 30;
+    pointer-events: auto;
 }
 
 @media (max-height: 800px) and (min-width: 761px) {
@@ -192,13 +222,17 @@
     }
 
     .setting-category__status,
-    .audio-placeholders {
+    .audio-controls {
         margin-top: 0.65rem;
     }
 
-    .audio-placeholders {
-        flex-direction: row;
-        flex-wrap: wrap;
+    .audio-control {
+        grid-template-columns: 1fr;
+        gap: 0.45rem;
+    }
+
+    .audio-control output {
+        text-align: left;
     }
 
     .binding-groups {

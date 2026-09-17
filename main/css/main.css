@@ -1,7 +1,13 @@
 
+
+
+
 .main-shell {
     --menu-width: clamp(18rem, 25vw, 25rem);
 }
+
+
+
 
 
 .main-shell .scene-background {
@@ -15,9 +21,15 @@
 }
 
 
+
+
+
 .main-shell .ambient-dust {
     opacity: 0.14;
 }
+
+
+
 
 
 .team-brand {
@@ -67,6 +79,9 @@
 }
 
 
+
+
+
 .game-identity {
     position: absolute;
     z-index: 5;
@@ -108,6 +123,9 @@
 .game-identity__signal::after {
     transform: scaleX(-1);
 }
+
+
+
 
 
 .main-menu {
@@ -152,6 +170,10 @@
 
 .main-menu__list li:nth-child(5) {
     animation-delay: 750ms;
+}
+
+.main-menu__list li:nth-child(6) {
+    animation-delay: 830ms;
 }
 
 .menu-item {
@@ -309,6 +331,9 @@
 }
 
 
+
+
+
 .operator-hud,
 .communication-hud {
     position: absolute;
@@ -338,6 +363,9 @@
 }
 
 
+
+
+
 @keyframes logoReveal {
     to {
         opacity: 1;
@@ -360,6 +388,9 @@
 }
 
 
+
+
+
 @media (max-height: 800px) and (min-width: 761px) {
     .game-identity {
         top: 2.4rem;
@@ -375,15 +406,15 @@
     }
 
     .main-menu__list {
-        gap: 0.2rem;
+        gap: 0.15rem;
     }
 
     .menu-item {
-        min-height: 3.25rem;
+        min-height: 2.85rem;
     }
 
     .menu-feedback {
-        top: 31.3rem;
+        top: 31.8rem;
     }
 
     .main-philosophy {

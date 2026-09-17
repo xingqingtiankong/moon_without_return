@@ -45,18 +45,8 @@ if (storyMode && !runtimeReturn && (params.get('new') === '1' || !MoonStorage.lo
     configVersion: MoonMapConfig.CONFIG_VERSION,
     checkpointId: 'prologue-start'
 };
-if (params.get('test') === '1') {
-    try {
-        overviewProgress = JSON.parse(sessionStorage.getItem('moon_test_state') || 'null') || overviewProgress;
-    } catch {
-    }
-}
-if (params.get('flow') === '1') {
-    try {
-        overviewProgress = JSON.parse(sessionStorage.getItem('moon_flow_state') || 'null') || overviewProgress;
-    } catch {
-    }
-}
+if (params.get('test') === '1') {try {overviewProgress=JSON.parse(sessionStorage.getItem('moon_test_state')||'null')||overviewProgress;} catch {}}
+if (params.get('flow') === '1') {try {overviewProgress=JSON.parse(sessionStorage.getItem('moon_flow_state')||'null')||overviewProgress;} catch {}}
 const recoveryMap = overviewProgress.currentMap;
 const story = new MoonStory({state: overviewProgress, tasks: [...MoonH01.tasks, ...MoonDay3.tasks]});
 const h01 = new MoonH01.Controller(story);
@@ -129,8 +119,68 @@ let leavingGame = false;
 let mapUnavailableTimer = 0;
 let nearestDoor = null;
 let lastTime = performance.now();
+function firstStoryLine(definition) {
+    for (const item of definition?.queue || []) {
+        if (item?.type === "line" && typeof item.text === "string") {
+            return item.text.replace(/\{[^}]+\}/g, "").trim();
+        }
+    }
+    return "";
+}
+
+function describeSaveState(state) {
+    const nodeId = String(state?.node || "");
+    const definition = globalThis.MoonCampaign?.nodes?.[nodeId];
+    const chapterEntry = globalThis.MoonLater?.chapters?.[state?.chapter];
+    let storyTitle = definition?.title || "";
+    let storySummary = definition?.targets?.[0]?.label || "";
+
+    if (!storySummary && globalThis.MoonH01?.objectives) {
+        const objective = globalThis.MoonH01.objectives(state)[0];
+        if (objective?.label) {
+            storySummary = `当前目标：${objective.label}`;
+            if (!storyTitle) storyTitle = "第一天 · 家";
+        }
+    }
+    if (!storySummary && globalThis.MoonDay3?.objectives) {
+        const objective = globalThis.MoonDay3.objectives(state)[0];
+        if (objective?.label) {
+            storySummary = `当前目标：${objective.label}`;
+            if (!storyTitle) storyTitle = "第三天 · 值勤与回家";
+        }
+    }
+    if (!storyTitle) {
+        if (nodeId === "P00") storyTitle = "序章 · 苏醒";
+        else if (nodeId === "H01") storyTitle = "第一天 · 家";
+        else if (nodeId === "H01_COMPLETE") storyTitle = "第一天的晚餐";
+        else if (nodeId.startsWith("H02_D3")) storyTitle = "第三天 · 值勤与回家";
+        else storyTitle = chapterEntry?.title || `第 ${Math.max(0, Math.min(9, state?.chapter || 0))} 章`;
+    }
+    if (!storySummary) {
+        storySummary = firstStoryLine(definition) || chapterEntry?.summary || "任务正在进行，已保存当前探索位置与状态。";
+    }
+    return {
+        snapshot: null,
+        snapshotScene: {
+            mapId: String(state?.currentMap || ""),
+            x: Number.isFinite(state?.playerPosition?.x) ? state.playerPosition.x : 755.4,
+            y: Number.isFinite(state?.playerPosition?.y) ? state.playerPosition.y : 743.7,
+            facingRow: Number.isInteger(facingRow) ? facingRow : 0,
+            sprite: state?.currentMap === "R09" ? "spacesuit" : "idle"
+        },
+        storyTitle,
+        storySummary,
+        chapterTitle: chapterEntry?.title || (state?.chapter === 0 ? "序章" : `第 ${state?.chapter || 0} 章`)
+    };
+}
+
+window.MoonSaveContext = Object.freeze({capture: describeSaveState});
 let mapImage = new Image();
 let mapReady = false;
+const familyGlitchImages = {
+    stage1: Object.assign(new Image(), {src: "../img/maps/01_家庭/F01_崩坏1.png"}),
+    stage2: Object.assign(new Image(), {src: "../img/maps/01_家庭/F01_崩坏2.png"})
+};
 let spriteSheet = null;
 let spriteReady = false;
 let spacesuitSheet = null;
@@ -194,12 +244,9 @@ function updateHud() {
 
 function updateStoryHud() {
     $('.evidence-cards')?.remove();
-    const journalList = $('.journal-entry ul');
-    if (journalList) journalList.hidden = false;
+    const journalList=$('.journal-entry ul');if(journalList)journalList.hidden=false;
     updateStoryHudBase();
-    if (storyMode) {
-        if (journalEvidence) MoonEvidence.render($('.journal-entry'), story.state); else updateInvestigationJournal();
-    }
+    if (storyMode) {if(journalEvidence)MoonEvidence.render($('.journal-entry'),story.state);else updateInvestigationJournal();}
 }
 
 function updateStoryHudBase() {
@@ -208,19 +255,19 @@ function updateStoryHudBase() {
     $('#chapter-day').textContent = `第一章 · 第 ${s.day} 天`;
     const remaining = s.day === 1 ? 365 : 365 - s.day;
     if (campaign.node || s.chapterComplete) {
-        $('#chapter-day').textContent = `${s.flags.archive_mode ? '档案重建 · 只读' : s.chapter === 0 ? '序章' : (MoonLater.chapters[s.chapter]?.title || '第一章')} · 第 ${s.day} 天 · ${s.flags.player_name || (s.flags.independent17 ? "WUKANG-17" : "WUKANG")} ${s.flags.plan_terminated ? '' : ('· 剩余 ' + remaining + ' 天')}`;
+        $('#chapter-day').textContent = `${s.flags.archive_mode ? '档案重建 · 只读' : s.chapter === 0 ? '序章' : (MoonLater.chapters[s.chapter]?.title || '第一章')} · 第 ${s.day} 天 · ${s.flags.player_name||(s.flags.independent17?"WUKANG-17":"WUKANG")} ${s.flags.plan_terminated?'':('· 剩余 '+remaining+' 天')}`;
         const def = campaign.node, targets = def?.targets || [], list = $('#task-list');
         list.replaceChildren();
         $('#task-count').textContent = s.chapterComplete ? '完成' : `${targets.length ? 0 : 1}/1`;
-        for (const text of s.chapterComplete ? [(MoonLater.chapters[s.chapter]?.title || '第一章') + ' · 已完成'] : targets.length ? targets.map(o => o.label) : [def.title]) {
+        for (const text of s.chapterComplete ? [(MoonLater.chapters[s.chapter]?.title||'第一章')+' · 已完成'] : targets.length ? targets.map(o => o.label) : [def.title]) {
             const li = document.createElement('li');
             li.textContent = text;
             list.append(li);
         }
         const entry = $('.journal-entry');
-        entry.querySelector('h2').textContent = journalEvidence ? '证据档案' : def?.title || (MoonLater.chapters[s.chapter]?.title + ' · 完成');
+        entry.querySelector('h2').textContent = journalEvidence ? '证据档案' : def?.title || (MoonLater.chapters[s.chapter]?.title+' · 完成');
         entry.querySelector('b').textContent = journalEvidence ? String(s.evidence.length) : `精神 ${s.mental_value}`;
-        entry.querySelector('p').textContent = journalEvidence ? '这里只记录已经亲自核验的物证。' : s.chapterComplete ? (MoonLater.chapters[s.chapter]?.summary || '本章完成。') : targets[0]?.label || '正在交谈';
+        entry.querySelector('p').textContent = journalEvidence ? '这里只记录已经亲自核验的物证。' : s.chapterComplete ? (MoonLater.chapters[s.chapter]?.summary||'本章完成。') : targets[0]?.label || '正在交谈';
         const ul = entry.querySelector('ul');
         ul.replaceChildren();
         for (const text of journalEvidence ? s.evidence.map(id => ({
@@ -379,7 +426,72 @@ function nearestWalkable(point) {
             if (playerCanWalk(mapId, x, y, foot.radiusX, foot.radiusY)) return {x, y};
         }
     }
-    return {x: 836, y: 600};
+ return {x: 836, y: 600};
+}
+
+const familyDoorPairs=new Set([
+ "F00:F01","F01:F00",
+ "F01:F02","F02:F01",
+ "F01:F03","F03:F01",
+ "F01:F04","F04:F01"
+]);
+
+function playFamilyDoorSfx(from,to){
+ if(familyDoorPairs.has(`${from}:${to}`))MoonSound.playDoorSfx();
+}
+
+const baseDoorMaps=new Set([
+ "R01","R02","R03","R04","R05","R06","R07","R08",
+ "B01","B02","B03","B04","B05",
+ "A02","A03","A04","A05","A06","A07"
+]);
+
+const cloneRevealNodes=new Set([
+ "M02_LIGHT16","M02_CURRENT","M02_GROWTH","M02_PREV16","M02_PREVALL","M02_ORIGINAL"
+]);
+
+function playDoorTransitionSfx(from,to){
+ if((from==='F01'&&to==='F05')||(from==='F05'&&to==='F01')){
+  MoonSound.playBalconyDoorSfx();
+  return;
+ }
+ if(familyDoorPairs.has(`${from}:${to}`))MoonSound.playDoorSfx();
+ if(baseDoorMaps.has(from)&&baseDoorMaps.has(to))MoonSound.playBaseDoorSfx();
+}
+
+function syncSceneMusic() {
+    if (mapId === 'B02' && cloneRevealNodes.has(story.state.node)) {
+        MoonSound.stopHomeVoice();
+        MoonSound.stopBaseMusic();
+        MoonSound.stopEchoMusic();
+        MoonSound.stopArchiveMusic();
+        MoonSound.playCloneMusic();
+        return;
+    }
+    MoonSound.stopCloneMusic();
+    if (mapId.startsWith('A')) {
+        MoonSound.stopHomeVoice();
+        MoonSound.stopBaseMusic();
+        MoonSound.stopEchoMusic();
+        MoonSound.playArchiveMusic();
+        return;
+    }
+    MoonSound.stopArchiveMusic();
+    const node = story.state.node;
+
+
+    const echoScene = story.state.chapter === 1 && (
+        (node === 'H04_PASS2' && story.busy) ||
+        ['H04_FOLLOW', 'H04_LIFT', 'H04_CACHE', 'H04_MEDIUM', 'V_CACHE_CLEAR', 'V_CACHE_HASH'].includes(node)
+    );
+    if (echoScene) {
+        MoonSound.stopHomeVoice();
+        MoonSound.playEchoMusic();
+        return;
+    }
+    MoonSound.stopEchoMusic();
+    if (mapId.startsWith('F')) MoonSound.playHomeVoice(); else MoonSound.stopHomeVoice();
+    if (mapId.startsWith('R') || mapId.startsWith('B')) MoonSound.playBaseMusic(); else MoonSound.stopBaseMusic();
 }
 
 function enterMap(nextId, spawn = null, fromSelector = false) {
@@ -391,7 +503,8 @@ function enterMap(nextId, spawn = null, fromSelector = false) {
     velocity = {x: 0, y: 0};
     moving = false;
     animationTime = 0;
-    if (!MoonHistory.testing) localStorage.setItem("moon_without_return_map_test_v1", mapId);
+    if(!MoonHistory.testing)localStorage.setItem("moon_without_return_map_test_v1", mapId);
+    syncSceneMusic();
     loadMapImage();
     updateHud();
     input.clear();
@@ -689,12 +802,8 @@ function renderFamilyActor(actor) {
 }
 
 function render() {
-    document.body.dataset.moonWalk = String(storyMode && mapId === 'R09' && story.state.flags.outside_ready);
-    if (storyMode && mapId === 'R09' && story.state.flags.outside_ready) {
-        const s = story.state,
-            text = MoonFinal.name(s) + ' · 氧量 ' + s.flags.oxygen + '% · 信标 ' + (Math.round(Math.hypot(position.x - 1200, position.y - 650) / 10) * 10) + ' m';
-        if ($('#chapter-day').textContent !== text) $('#chapter-day').textContent = text;
-    }
+    document.body.dataset.moonWalk=String(storyMode&&mapId==='R09'&&story.state.flags.outside_ready);
+    if(storyMode&&mapId==='R09'&&story.state.flags.outside_ready){const s=story.state,text=MoonFinal.name(s)+' · 氧量 '+s.flags.oxygen+'% · 信标 '+(Math.round(Math.hypot(position.x-1200,position.y-650)/10)*10)+' m';if($('#chapter-day').textContent!==text)$('#chapter-day').textContent=text;}
     const pixelRatio = devicePixelRatio || 1, targetW = Math.round(canvas.clientWidth * pixelRatio),
         targetH = Math.round(canvas.clientHeight * pixelRatio);
     if (canvas.width !== targetW || canvas.height !== targetH) {
@@ -711,9 +820,9 @@ function render() {
     ctx.translate(offsetX, offsetY);
     ctx.scale(scale, scale);
     if (mapReady) ctx.drawImage(mapImage, 0, 0, MAP_SIZE.width, MAP_SIZE.height);
-    if (storyMode && ['S1', 'S2', 'S3'].includes(story.state.family_state) && mapId === 'F01' && Math.floor(performance.now() / 1500) % 6 === 0) {
-        ctx.fillStyle = '#020303';
-        ctx.fillRect(225, 38, 265, 102);
+    if (storyMode && ['S1','S2','S3'].includes(story.state.family_state) && mapId === 'F01' && Math.floor(performance.now() / 1500) % 6 === 0) {
+        const glitch = familyGlitchImages.stage1;
+        if (glitch.complete && glitch.naturalWidth) ctx.drawImage(glitch, 0, 0, MAP_SIZE.width, MAP_SIZE.height);
     }
     if (storyMode && story.state.node === 'H04_PASS2' && story.busy && mapId === 'R02' && walkSheet && echoTime < 5) {
         const frame = walkAnimation.frame(echoTime, 2), direction = walkAnimation.directions[2],
@@ -723,20 +832,14 @@ function render() {
         ctx.drawImage(walkSheet, frame * 256, direction.row * 256, 256, 256, 965 - echoTime * 35 - size.width / 2, 510 - size.height * 244 / 256, size.width, size.height);
         ctx.restore();
     }
-    if (storyMode) {
-        renderChapterEnvironment();
-        MoonFinalScene.draw(ctx, story.state, mapId, position);
-    }
+    if(storyMode){renderChapterEnvironment();MoonFinalScene.draw(ctx,story.state,mapId,position);}
     renderTaskObjects();
     if (showCollision) renderCollision();
     if (showDoorInteractions) renderDoorInteractions();
     const actors = familyPatrol.visible(mapId).map(actor => ({y: actor.y, draw: () => renderFamilyActor(actor)}));
     actors.push({y: position.y, draw: renderPlayer});
     actors.sort((a, b) => a.y - b.y).forEach(a => a.draw());
-    if (storyMode && story.state.flags.epilogue_black) {
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0, 0, 1672, 941);
-    }
+    if(storyMode&&story.state.flags.epilogue_black){ctx.fillStyle="#000";ctx.fillRect(0,0,1672,941);}
     ctx.restore();
 }
 
@@ -748,14 +851,13 @@ function openOverlay(id) {
     const layer = $("#" + id);
     if (!layer) return false;
     if (leavingGame) return false;
-    if (id === 'pause') {
-        if (!['pause', 'save-game', 'leave-confirm'].includes(activeOverlay)) pausedFrom = activeOverlay;
-        if (pausedFrom === 'minigame') puzzles.leaveFullscreen();
-        if (pausedFrom === 'final-form') MoonFinalForms.release();
-        $('#pause-save').disabled = !storyMode;
-        if (storyMode && !story.busy) story.save();
+    if(id==='pause'){
+        if(!['pause','save-game','leave-confirm'].includes(activeOverlay))pausedFrom=activeOverlay;
+        if(pausedFrom==='minigame')puzzles.leaveFullscreen();if(pausedFrom==='final-form')MoonFinalForms.release();
+        $('#pause-save').disabled=!storyMode;
+        if(storyMode&&!story.busy)story.save();
     }
-    if (id === 'save-game') renderGameSaves();
+    if(id==='save-game')renderGameSaves();
     if (!activeOverlay) overlayReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     if (activeOverlay && activeOverlay !== id) MoonUiMotion.hide($("#" + activeOverlay));
     const revision = ++overlayRevision;
@@ -776,19 +878,10 @@ function openOverlay(id) {
 }
 
 function closeOverlay(id, restoreFocus = true) {
-    if (id === 'save-game' || (id === 'leave-confirm' && pausedFrom)) {
-        openOverlay('pause');
-        return Promise.resolve(true);
-    }
-    if (id === 'pause' && pausedFrom) {
-        const target = pausedFrom;
-        pausedFrom = null;
-        openOverlay(target);
-        if (target === 'minigame' && puzzles.started) restorePuzzleFullscreen();
-        return Promise.resolve(true);
-    }
-    if (id === 'final-form') MoonFinalForms.abort();
-    if (id === 'chapter-media') MoonChapterMedia.abort();
+    if(id==='save-game'||(id==='leave-confirm'&&pausedFrom)){openOverlay('pause');return Promise.resolve(true);}
+    if(id==='pause'&&pausedFrom){const target=pausedFrom;pausedFrom=null;openOverlay(target);if(target==='minigame'&&puzzles.started)restorePuzzleFullscreen();return Promise.resolve(true);}
+    if(id==='final-form')MoonFinalForms.abort();
+    if(id==='chapter-media')MoonChapterMedia.abort();
     if (story.busy && (id === "dialogue" || id === "choice")) return Promise.resolve(false);
     if (id === 'minigame') {
         if (puzzles.running && puzzles.result) return Promise.resolve(puzzles.confirm());
@@ -807,13 +900,7 @@ function closeOverlay(id, restoreFocus = true) {
         statusHuds?.obscure(false);
         input.clear();
         if (restoreFocus && overlayReturnFocus?.isConnected) overlayReturnFocus.focus({preventScroll: true});
-        if (id === 'ending' && storyMode) {
-            if (story.state.flags.game_complete) {
-                location.assign('../main/index.html');
-                return true;
-            }
-            MoonLater.startNext(story);
-        }
+        if(id==='ending'&&storyMode){if(story.state.flags.game_complete){location.assign('../main/index.html');return true;}MoonLater.startNext(story);}
         return true;
     });
 }
@@ -822,6 +909,11 @@ function openDailyGame(node, game, title) {
     $('#minigame-title').textContent = title;
     puzzles.open({node, game, title});
     openOverlay('minigame');
+}
+
+function openSettingsOverlay() {
+    $("#settings-frame").src = "../settings/index.html?return=game&t=" + Date.now();
+    openOverlay("settings");
 }
 
 function openMap() {
@@ -834,7 +926,7 @@ function openMap() {
         }, 1800);
         return false;
     }
-    if (story.state.flags.epilogue) return false;
+    if(story.state.flags.epilogue)return false;
     updateOverview();
     return openOverlay("overview");
 }
@@ -971,7 +1063,7 @@ function update(now) {
         dialogueReveal.tick(dt);
         $('#dialogue footer span').textContent = dialogueReveal.complete ? '继续' : '显示全文';
     }
-    if (!document.hidden && (!activeOverlay || ['dialogue', 'choice'].includes(activeOverlay))) story.tick(dt);
+    if (!document.hidden && (!activeOverlay || ['dialogue','choice'].includes(activeOverlay))) story.tick(dt);
     if (storyMode && mapReady && !activeOverlay && !story.busy && story.state.node === 'H01' && !story.state.flags.h01_started) h01.start();
     if (storyMode && mapReady && !activeOverlay && !story.busy) {
         if (campaign.node) campaign.automatic(); else day3.automatic();
@@ -1010,14 +1102,7 @@ function update(now) {
                     id: 'wrist_door_reminder',
                     once: false,
                     queue: [{type: 'line', actor: 'guanghan', text: '先拿起舱旁的腕端终端，完成体征确认后才能离开。'}]
-                }); else {
-                    const reason = storyMode ? MoonLater.door(story.state, mapId, nearestDoor.to) : '';
-                    if (reason) story.run({
-                        id: 'door_access_notice',
-                        once: false,
-                        queue: [{type: 'line', actor: 'guanghan', text: reason}]
-                    }); else enterMap(nearestDoor.to);
-                }
+                }); else {const reason=storyMode?MoonLater.door(story.state,mapId,nearestDoor.to):'';if(reason)story.run({id:'door_access_notice',once:false,queue:[{type:'line',actor:'guanghan',text:reason}]});else{playDoorTransitionSfx(mapId,nearestDoor.to);enterMap(nearestDoor.to);}}
             }
         }
         if (story.busy) {
@@ -1039,27 +1124,14 @@ function update(now) {
         else if (activeOverlay === "dialogue" && input.justPressed.has("Space")) {
             input.justPressed.delete("Space");
             advanceDialogue();
-        } else if (input.consume("pause")) {
-            if (["dialogue", "choice", "minigame", "chapter-media", "final-form"].includes(activeOverlay)) openOverlay("pause"); else closeOverlay(activeOverlay);
-        }
+        } else if (input.consume("pause")) {if(["dialogue","choice","minigame","chapter-media","final-form"].includes(activeOverlay))openOverlay("pause");else closeOverlay(activeOverlay);}
     }
     render();
     input.endFrame();
     requestAnimationFrame(update);
 }
 
-function showChapterEnd() {
-    const state = story.state, entry = globalThis.MoonEndings?.entries[state.flags.ending], chapter = entry ? {
-        title: entry.title,
-        summary: entry.intro
-    } : MoonLater.chapters[state.chapter] || MoonLater.chapters[1];
-    $('#ending-title').textContent = chapter.title;
-    $('#ending .ending-panel small').textContent = entry ? '结局已记录' : '章节完成';
-    $('#ending .ending-panel p').textContent = chapter.summary + ' 已保存 ' + MoonEvidence.collected(state).length + ' 项重要记录。';
-    $('#ending [data-close]').textContent = state.flags.game_complete ? '返回主菜单' : chapter.next ? '继续第' + (state.chapter + 1) + '章' : '返回基地';
-    openOverlay('ending');
-    if (entry) window.dispatchEvent(new CustomEvent('moon:ending-visible', {detail: state}));
-}
+function showChapterEnd(){const state=story.state,entry=globalThis.MoonEndings?.entries[state.flags.ending],chapter=entry?{title:entry.title,summary:entry.intro}:MoonLater.chapters[state.chapter]||MoonLater.chapters[1];$('#ending-title').textContent=chapter.title;$('#ending .ending-panel small').textContent=entry?'结局已记录':'章节完成';$('#ending .ending-panel p').textContent=chapter.summary+' 已保存 '+MoonEvidence.collected(state).length+' 项重要记录。';$('#ending [data-close]').textContent=state.flags.game_complete?'返回主菜单':chapter.next?'继续第'+(state.chapter+1)+'章':'返回基地';openOverlay('ending');if(entry)window.dispatchEvent(new CustomEvent('moon:ending-visible',{detail:state}));}
 
 function advanceDialogue() {
     if (activeOverlay !== 'dialogue') return;
@@ -1070,12 +1142,15 @@ function advanceDialogue() {
 
 function bindUi() {
     window.addEventListener('keyup', e => {
-        if (e.code === 'Space') puzzles.pouring = false;
-        MoonActivities.newRelease?.(puzzles, e.code === 'KeyW' && puzzles.classic?.kind === 'jump' ? 'Space' : e.code);
+        if (e.code === 'Space') puzzles.pouring = false;MoonActivities.newRelease?.(puzzles,e.code==='KeyW'&&puzzles.classic?.kind==='jump'?'Space':e.code);
     });
     window.addEventListener('blur', () => puzzles.pouring = false);
-    window.addEventListener('pointerdown', () => MoonSound.unlock(), {once: true});
-    window.addEventListener('keydown', () => MoonSound.unlock(), {once: true});
+    const resumeAudio = () => {
+        MoonSound.unlock();
+        syncSceneMusic();
+    };
+    window.addEventListener('pointerdown', resumeAudio, {once: true});
+    window.addEventListener('keydown', resumeAudio, {once: true});
     $('#wake-start').addEventListener('click', () => {
         MoonSound.unlock();
         MoonSound.noise(1.5, .02);
@@ -1088,43 +1163,21 @@ function bindUi() {
         puzzles.open(event.detail);
         openOverlay('minigame');
     });
-    window.addEventListener('moon:chapter-media', event => {
-        const def = MoonCampaign.nodes[event.detail.node];
-        if (story.state.node !== def.id) return;
-        MoonChapterMedia.open(def.id, () => closeOverlay('chapter-media').then(() => {
-            if (story.state.node === def.id) campaign.commit(def);
-        }));
-        openOverlay('chapter-media');
-    });
-    window.addEventListener('moon:final-form', event => {
-        const def = MoonCampaign.nodes[event.detail.node];
-        MoonFinalForms.open(def, story.state, flags => {
-            closeOverlay('final-form').then(() => {
-                if (story.state.node === def.id) campaign.commit({
-                    ...def,
-                    effects: {...def.effects, flags: {...def.effects?.flags, ...flags}}
-                });
-            });
-        });
-        openOverlay('final-form');
-    });
+    window.addEventListener('moon:chapter-media',event=>{const def=MoonCampaign.nodes[event.detail.node];if(story.state.node!==def.id)return;MoonChapterMedia.open(def.id,()=>closeOverlay('chapter-media').then(()=>{if(story.state.node===def.id)campaign.commit(def);}));openOverlay('chapter-media');});
+    window.addEventListener('moon:final-form',event=>{const def=MoonCampaign.nodes[event.detail.node];MoonFinalForms.open(def,story.state,flags=>{closeOverlay('final-form').then(()=>{if(story.state.node===def.id)campaign.commit({...def,effects:{...def.effects,flags:{...def.effects?.flags,...flags}}});});});openOverlay('final-form');});
     $('#dialogue .dialogue-box').addEventListener('click', advanceDialogue);
-    $('#skip-dialogue').addEventListener('click', () => {
-        if (activeOverlay === 'dialogue') {
-            dialogueReveal.finish();
-            if (!story.skipSegment()) closeOverlay('dialogue');
-        }
-    });
-    $('#pause-save').addEventListener('click', () => openOverlay('save-game'));
-    $('#retry-minigame').addEventListener('click', () => {
-        if (activeOverlay === 'minigame' && puzzles.retry()) restorePuzzleFullscreen();
-    });
+    $('#skip-dialogue').addEventListener('click',()=>{if(activeOverlay==='dialogue'){dialogueReveal.finish();if(!story.skipSegment())closeOverlay('dialogue');}});
+    $('#pause-save').addEventListener('click',()=>openOverlay('save-game'));
+    $('#retry-minigame').addEventListener('click',()=>{if(activeOverlay==='minigame'&&puzzles.retry())restorePuzzleFullscreen();});
     $('.terminal-body .primary-action').addEventListener('click', () => {
         if (storyMode && activeOverlay === 'terminal' && nearestInteraction?.kind === 'temperature' && !story.busy) day3.resetTemperature();
     });
     window.addEventListener("moon:story-presentation", event => {
+        syncSceneMusic();
         const item = event.detail;
-        $('#dialogue').dataset.wait = String(item?.type === 'wait');
+        $('#dialogue').dataset.wait=String(item?.type==='wait');
+
+        if (item?.type !== 'line') $('#dialogue-portrait').hidden = true;
         $('#story-detail').hidden = !item?.illustration;
         if (item?.illustration) {
             const detail = $('#story-detail');
@@ -1162,7 +1215,7 @@ function bindUi() {
         } else {
             if (item.type === "line") {
                 const actor = MoonCampaign.actors[item.actor] || MoonChapter1.actors[item.actor] || MoonChapter1.actors.system;
-                $("#dialogue-speaker").textContent = item.actor === 'wukang' && story.state.flags.player_name ? story.state.flags.player_name : actor.name;
+                $("#dialogue-speaker").textContent = item.actor==='wukang'&&story.state.flags.player_name?story.state.flags.player_name:actor.name;
                 $("#dialogue-role").textContent = actor.role;
                 const labels = {
                     move: ['moveUp', 'moveLeft', 'moveDown', 'moveRight'].map(a => MoonStorage.keyLabel(input.code(a))).join('/'),
@@ -1173,9 +1226,13 @@ function bindUi() {
                 };
                 dialogueReveal.start((item.text || '').replace(/\{(move|interact|map|journal|pause)\}/g, (_, key) => labels[key]));
                 const portrait = $("#dialogue-portrait");
-                portrait.hidden = !actor.portrait;
-                if (actor.portrait) portrait.src = actor.portrait;
-                portrait.alt = actor.name;
+                const expression = globalThis.MoonDialogueExpressions?.resolve(item, story.state);
+                const portraitSrc = expression?.src || actor.portrait;
+                portrait.hidden = !portraitSrc;
+                if (portraitSrc) portrait.src = portraitSrc;
+                portrait.alt = expression ? `${actor.name} · ${expression.label}` : actor.name;
+                if (expression) portrait.dataset.expression = expression.emotion;
+                else delete portrait.dataset.expression;
             }
             openOverlay("dialogue");
         }
@@ -1195,15 +1252,9 @@ function bindUi() {
     document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", () => closeOverlay(button.dataset.close)));
     $("#request-main-menu").addEventListener("click", () => openOverlay("leave-confirm"));
     $("#cancel-leave").addEventListener("click", () => openOverlay("pause"));
-    $("#pause a[href*='settings']").addEventListener("click", () => {
+    $("#pause-settings").addEventListener("click", () => {
         if (storyMode) story.save();
-        sessionStorage.setItem(runtimeReturnKey, JSON.stringify({
-            mapId,
-            position: {...position},
-            facingRow,
-            overviewProgress,
-            storyMode
-        }));
+        openSettingsOverlay();
     });
     document.querySelectorAll('.ui-layer a[href]').forEach(link => link.addEventListener("click", event => {
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
@@ -1222,26 +1273,17 @@ function bindUi() {
         updateStoryHud();
     }));
     document.addEventListener("keydown", event => {
-        if (event.code === 'Enter' && ['dialogue', 'chapter-media'].includes(activeOverlay) && !input.isEditable(event.target)) {
-            event.preventDefault();
-            event.stopPropagation();
-            input.clear();
-            if (!event.repeat) {
-                if (activeOverlay === 'dialogue') $('#skip-dialogue').click(); else MoonChapterMedia.skip();
-            }
-            return;
+        if(event.code==='Enter'&&['dialogue','chapter-media'].includes(activeOverlay)&&!input.isEditable(event.target)){
+            event.preventDefault();event.stopPropagation();input.clear();if(!event.repeat){if(activeOverlay==='dialogue')$('#skip-dialogue').click();else MoonChapterMedia.skip();}return;
         }
-        if (event.code === 'KeyR' && activeOverlay === 'minigame' && !input.isEditable(event.target)) {
-            event.preventDefault();
-            event.stopPropagation();
-            input.clear();
-            if (!event.repeat && puzzles.retry()) restorePuzzleFullscreen();
-            return;
+        if(event.code==='KeyR'&&activeOverlay==='minigame'&&!input.isEditable(event.target)){
+            event.preventDefault();event.stopPropagation();input.clear();
+            if(!event.repeat&&puzzles.retry())restorePuzzleFullscreen();return;
         }
         if (activeOverlay === 'minigame' && !input.isEditable(event.target)) {
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space'].includes(event.code)) event.preventDefault();
-            if ((['sokoban', 'merge'].includes(puzzles.classic?.kind) && event.code.startsWith('Arrow')) || (['flier', 'runner'].includes(puzzles.classic?.kind) && ['Space', 'ArrowUp'].includes(event.code))) event.preventDefault();
-            if (!event.repeat) puzzles.key(event.code);
+            if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyA','KeyS','KeyD','Space'].includes(event.code))event.preventDefault();
+            if ((['sokoban','merge'].includes(puzzles.classic?.kind)&&event.code.startsWith('Arrow'))||(['flier','runner'].includes(puzzles.classic?.kind)&&['Space','ArrowUp'].includes(event.code))) event.preventDefault();
+            if(!event.repeat)puzzles.key(event.code);
         }
         if (activeOverlay === "overview" && event.code === input.code("map")) {
             event.preventDefault();
@@ -1273,6 +1315,34 @@ function bindUi() {
         }
     });
     window.addEventListener("moon:settings-changed", updateHud);
+    window.addEventListener("message", event => {
+        if (!event.data) return;
+
+
+
+        if (event.data.type === "moon-settings-close") {
+            const frame = $("#settings-frame");
+            if (event.source !== frame?.contentWindow || activeOverlay !== "settings") return;
+            closeOverlay("settings").then(() => {
+                if (activeOverlay === "settings") {
+                    const layer = $("#settings");
+                    layer.hidden = true;
+                    layer.classList.remove("is-visible", "is-closing");
+                    activeOverlay = null;
+                    document.body.classList.remove("has-modal");
+                    statusHuds?.obscure(false);
+                }
+            });
+            return;
+        }
+        if (event.origin !== location.origin) return;
+        if (event.data.type === "moon-settings-changed") {
+            MoonSound.setAudioVolumes(event.data.detail || MoonStorage.loadSettings());
+            window.dispatchEvent(new CustomEvent("moon:settings-changed", {detail: event.data.detail || MoonStorage.loadSettings()}));
+            updateHud();
+            return;
+        }
+    });
     window.addEventListener("moon:progress-changed", event => {
         const state = MoonStorage.migrateSave(event.detail);
         if (!state) return;
@@ -1329,6 +1399,9 @@ function initialize() {
         $('.journal-panel .panel-heading small').textContent = '任务与证据';
         updateStoryHud();
         story.save();
+        requestAnimationFrame(() => {
+            if (storyMode) story.save();
+        });
     }
     if (storyMode && params.get('new') === '1') {
         const resumeUrl = new URL(location.href);
@@ -1336,7 +1409,7 @@ function initialize() {
         history.replaceState(null, '', resumeUrl);
     }
     initialized = true;
-    if (storyMode && story.state.chapterComplete) requestAnimationFrame(showChapterEnd);
+    if(storyMode&&story.state.chapterComplete)requestAnimationFrame(showChapterEnd);
     if (awakening) {
         $('#wake-screen').hidden = false;
         statusHuds.obscure(true);
@@ -1371,10 +1444,17 @@ function initialize() {
             return isWalkable(id, x, y, foot.radiusX, foot.radiusY);
         }, maps: MAPS
     };
-    window.MoonUiDebug = {
+window.MoonUiDebug = {
         open: openOverlay, close: closeOverlay, openMap, get active() {
             return activeOverlay;
         }, states: ["journal", "overview", "pause", "choice", "dialogue", "terminal", "minigame", "ending"]
+    };
+    window.MoonSettingsBridge = {
+        close: () => {
+            if (activeOverlay !== "settings") return false;
+            closeOverlay("settings");
+            return true;
+        }
     };
     const preview = params.get("ui");
     if (window.MoonUiDebug.states.includes(preview)) requestAnimationFrame(() => preview === "overview" ? openMap() : openOverlay(preview));
@@ -1382,109 +1462,43 @@ function initialize() {
 }
 
 initialize();
-
-function renderChapterEnvironment() {
-    const s = story.state;
-    if (mapId === 'B02' && s.chapter >= 2) {
-        ctx.save();
-        if (!s.flags.culture_power) {
-            ctx.fillStyle = '#000b';
-            ctx.fillRect(0, 0, 1672, 941);
-        }
-        const count = s.flags.pods_lit || 0;
-        ctx.font = 'bold 22px monospace';
-        ctx.textAlign = 'center';
-        [1180, 1000, 820, 650, 465].forEach((x, i) => {
-            ctx.fillStyle = i < count ? '#ddc886' : '#202b2c';
-            ctx.fillRect(x - 40, 372, 80, 30);
-            if (i < count) {
-                ctx.fillStyle = '#192629';
-                ctx.fillText(String(17 - i), x, 395);
-            }
-        });
-        ctx.restore();
-    }
-    if (mapId === 'F01' && ['S2', 'S3'].includes(s.family_state)) {
-        ctx.save();
-        ctx.fillStyle = '#030b0ed9';
-        ctx.fillRect(225, 38, 265, 102);
-        ctx.fillRect(76, 245, 210, 110);
-        ctx.strokeStyle = '#54737a';
-        ctx.lineWidth = 12;
-        ctx.beginPath();
-        ctx.moveTo(230, 65);
-        ctx.lineTo(545, 65);
-        ctx.lineTo(545, 205);
-        ctx.lineTo(1060, 205);
-        ctx.stroke();
-        ctx.strokeStyle = '#a18b60';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        ctx.fillStyle = '#04141c55';
-        ctx.fillRect(0, 0, 1672, 941);
-        ctx.restore();
-    }
-    if (mapId === 'R06' && s.flags.reply_queued) {
-        ctx.save();
-        ctx.fillStyle = '#d6b557';
-        ctx.beginPath();
-        ctx.arc(910, 340, 9, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.font = '18px sans-serif';
-        ctx.fillText('地球待确认', 930, 348);
-        ctx.restore();
-    }
-    if (mapId === 'R05' && s.node === 'M03_SEE' && walkSheet) {
-        const size = getCharacterDrawSize(mapId);
-        ctx.save();
-        ctx.globalAlpha = .28;
-        ctx.drawImage(walkSheet, 0, 4 * 256, 256, 256, 1000 - size.width / 2, 490 - size.height * 244 / 256, size.width, size.height);
-        ctx.restore();
-    }
+function renderChapterEnvironment(){
+ const s=story.state;
+ if(mapId==='B02'&&s.chapter>=2){ctx.save();if(!s.flags.culture_power){ctx.fillStyle='#000b';ctx.fillRect(0,0,1672,941);}const count=s.flags.pods_lit||0;ctx.font='bold 22px monospace';ctx.textAlign='center';[1180,1000,820,650,465].forEach((x,i)=>{ctx.fillStyle=i<count?'#ddc886':'#202b2c';ctx.fillRect(x-40,372,80,30);if(i<count){ctx.fillStyle='#192629';ctx.fillText(String(17-i),x,395);}});ctx.restore();}
+ if(mapId==='F01'&&['S2','S3'].includes(s.family_state)){ctx.save();const glitch=familyGlitchImages.stage2;if(glitch.complete&&glitch.naturalWidth)ctx.drawImage(glitch,0,0,MAP_SIZE.width,MAP_SIZE.height);ctx.restore();}
+ if(mapId==='R06'&&s.flags.reply_queued){ctx.save();ctx.fillStyle='#d6b557';ctx.beginPath();ctx.arc(910,340,9,0,Math.PI*2);ctx.fill();ctx.font='18px sans-serif';ctx.fillText('地球待确认',930,348);ctx.restore();}
+ if(mapId==='R05'&&s.node==='M03_SEE'&&walkSheet){const size=getCharacterDrawSize(mapId);ctx.save();ctx.globalAlpha=.28;ctx.drawImage(walkSheet,0,4*256,256,256,1000-size.width/2,490-size.height*244/256,size.width,size.height);ctx.restore();}
 }
-
-function restorePuzzleFullscreen() {
-    const screen = $('#minigame');
-    if (!document.fullscreenElement && screen.requestFullscreen) screen.requestFullscreen().then(() => {
-        puzzles.ownsFullscreen = true;
-        if (activeOverlay !== 'minigame') puzzles.leaveFullscreen();
-    }).catch(() => {
-    });
+function restorePuzzleFullscreen(){
+    const screen=$('#minigame');
+    if(!document.fullscreenElement&&screen.requestFullscreen)screen.requestFullscreen().then(()=>{puzzles.ownsFullscreen=true;if(activeOverlay!=='minigame')puzzles.leaveFullscreen();}).catch(()=>{});
 }
-
-function renderGameSaves() {
-    overwriteSlot = null;
-    $('#save-game-status').textContent = '';
-    $('#save-game-note').textContent = story.busy ? '本段对话尚未结束。保存已确认的进度，读档后从本段开始。' : puzzles.running ? '保存当前任务与证据；读档后，本次小游戏从头开始。' : '保存当前所在位置、任务、证据与选择。';
-    const root = $('#game-save-slots');
-    root.replaceChildren();
-    MoonStorage.listSlots().forEach(({id, data}) => {
-        const card = document.createElement('article'), label = document.createElement('strong'),
-            detail = document.createElement('p'), button = document.createElement('button');
-        card.className = 'game-save-slot';
-        label.textContent = '存档 ' + String(id).padStart(2, '0');
-        detail.textContent = data ? (data.flags.player_name ? data.flags.player_name + ' · ' : '') + '第 ' + data.chapter + ' 章 · 第 ' + data.day + ' 天 · ' + data.currentMap + ' · ' + new Date(data.savedAt).toLocaleString('zh-CN', {hour12: false}) : '空存档';
-        button.type = 'button';
-        button.dataset.slot = id;
-        button.textContent = data ? '覆盖此存档' : '存入此处';
-        button.setAttribute('aria-label', '保存到存档 ' + id);
-        button.addEventListener('click', () => {
-            if (MoonStorage.loadGame(id) && overwriteSlot !== id) {
-                overwriteSlot = id;
-                root.querySelectorAll('button').forEach(b => b.textContent = MoonStorage.loadGame(Number(b.dataset.slot)) ? '覆盖此存档' : '存入此处');
-                button.textContent = '确认覆盖';
-                $('#save-game-status').textContent = '再次点击确认覆盖存档 ' + id + '。';
-                return;
-            }
-            if (!story.busy) story.setLocation(mapId, position.x, position.y);
-            const saved = story.saveCheckpoint(id);
-            if (saved) {
-                renderGameSaves();
-                $('#save-game-status').textContent = '已保存到存档 ' + id + '。';
-                root.querySelector('[data-slot="' + id + '"]').focus();
-            } else $('#save-game-status').textContent = '保存失败，浏览器未能写入本地存储，请重试。';
+function renderGameSaves(){
+    overwriteSlot=null;
+    $('#save-game-status').textContent='';
+    $('#save-game-note').textContent=story.busy?'本段对话尚未结束。保存已确认的进度，读档后从本段开始。':puzzles.running?'保存当前任务与证据；读档后，本次小游戏从头开始。':'保存当前所在位置、任务、证据与选择，并保留保存前的最后一刻画面与对应情节。';
+    const root=$('#game-save-slots');root.replaceChildren();
+    MoonStorage.listSlots().forEach(({id,data})=>{
+        const card=document.createElement('article');
+        card.className='game-save-slot'+(data?'':' is-empty');
+        const figure=MoonSaveThumbnail.create(data,'game-save-slot__thumb',{placeholder:'NO FRAME',label:'存档 '+id+' 的最后一刻画面'});
+        const body=document.createElement('div');body.className='game-save-slot__body';
+        const heading=document.createElement('div');heading.className='game-save-slot__heading';
+        const label=document.createElement('strong');label.textContent='存档 '+String(id).padStart(2,'0');
+        const chapter=document.createElement('small');chapter.textContent=data?(data.chapterTitle||('第 '+(data.chapter||0)+' 章')):'EMPTY';
+        heading.append(label,chapter);
+        const plot=document.createElement('b');plot.className='game-save-slot__plot';plot.textContent=data?(data.storyTitle||'未记录情节'):'未检测到任务记录';
+        const summary=document.createElement('p');summary.className='game-save-slot__summary';summary.textContent=data?(data.storySummary||'任务正在进行，已保存当前探索位置与状态。'):'空白档案槽位。';
+        const detail=document.createElement('p');detail.className='game-save-slot__meta';
+        detail.textContent=data?(data.flags.player_name?data.flags.player_name+' · ':'')+'第 '+data.chapter+' 章 · 第 '+data.day+' 天 · '+data.currentMap+' · '+new Date(data.savedAt).toLocaleString('zh-CN',{hour12:false}):'EMPTY SLOT';
+        body.append(heading,plot,summary,detail);
+        const button=document.createElement('button');
+        button.type='button';button.dataset.slot=id;button.textContent=data?'覆盖此存档':'存入此处';button.setAttribute('aria-label','保存到存档 '+id);
+        button.addEventListener('click',()=>{
+            if(MoonStorage.loadGame(id)&&overwriteSlot!==id){overwriteSlot=id;root.querySelectorAll('button').forEach(b=>b.textContent=MoonStorage.loadGame(Number(b.dataset.slot))?'覆盖此存档':'存入此处');button.textContent='确认覆盖';$('#save-game-status').textContent='再次点击确认覆盖存档 '+id+'。';return;}
+            if(!story.busy)story.setLocation(mapId,position.x,position.y);
+            const saved=story.saveCheckpoint(id);if(saved){renderGameSaves();$('#save-game-status').textContent='已保存到存档 '+id+'，已记录最后一刻画面与情节。';root.querySelector('[data-slot="'+id+'"]').focus();}else $('#save-game-status').textContent='保存失败，浏览器未能写入本地存储，请重试。';
         });
-        card.append(label, detail, button);
-        root.append(card);
+        card.append(figure,body,button);root.append(card);
     });
 }

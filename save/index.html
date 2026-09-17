@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="./css/save.css">
     <script src="../shared/js/common.js" defer></script>
     <script src="../shared/js/storage.js" defer></script>
+    <script src="../shared/js/menu-bgm.js" defer></script>
+    <script src="../game/js/config.js" defer></script>
+    <script src="../game/js/walk-animation.js" defer></script>
+    <script src="../shared/js/save-thumbnail.js" defer></script>
     <script src="./js/save.js" defer></script>
 </head>
 <body>
@@ -30,7 +34,7 @@
     <section class="archive-panel save-panel" aria-labelledby="archive-directory-title">
         <header class="panel-heading">
             <h2 id="archive-directory-title">存档目录</h2>
-            <p id="archive-count">LOCAL MISSION RECORDS</p>
+            <p id="archive-count">LAST FRAME ARCHIVE</p>
         </header>
         <ol class="save-slots" id="save-slots" aria-label="存档槽位"></ol>
     </section>
@@ -51,5 +55,6 @@
         </p>
     </aside>
 </main>
+    <audio class="visually-hidden" id="menu-bgm" src="../shared/audio/menu-bgm.mp3" loop preload="auto"></audio>
 </body>
 </html>

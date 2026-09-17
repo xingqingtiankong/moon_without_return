@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="../shared/css/base.css">
     <link rel="stylesheet" href="./css/main.css">
     <script src="../shared/js/common.js" defer></script>
+    <script src="../shared/js/storage.js" defer></script>
+    <script src="../shared/js/display-settings.js" defer></script>
+    <script src="../shared/js/menu-bgm.js" defer></script>
     <script src="./js/main.js" defer></script>
 </head>
 <body>
@@ -66,8 +69,18 @@
                 </button>
             </li>
             <li>
-                <button class="menu-item" type="button" data-action="about">
+                <button class="menu-item" type="button" data-action="flowchart">
                     <span class="menu-item__index">04 /</span>
+                    <span class="menu-item__copy">
+                            <span class="menu-item__zh">剧情流程</span>
+                            <span class="menu-item__en">STORY FLOW</span>
+                        </span>
+                    <span class="menu-item__line" aria-hidden="true"></span>
+                </button>
+            </li>
+            <li>
+                <button class="menu-item" type="button" data-action="about">
+                    <span class="menu-item__index">05 /</span>
                     <span class="menu-item__copy">
                             <span class="menu-item__zh">关于我们</span>
                             <span class="menu-item__en">ABOUT US</span>
@@ -77,7 +90,7 @@
             </li>
             <li>
                 <button class="menu-item" type="button" data-action="settings">
-                    <span class="menu-item__index">05 /</span>
+                    <span class="menu-item__index">06 /</span>
                     <span class="menu-item__copy">
                             <span class="menu-item__zh">设置</span>
                             <span class="menu-item__en">SETTINGS</span>
@@ -112,5 +125,6 @@
     </aside>
 
 </main>
+    <audio class="visually-hidden" id="menu-bgm" src="../shared/audio/menu-bgm.mp3" loop preload="auto"></audio>
 </body>
 </html>

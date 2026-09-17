@@ -1,3 +1,7 @@
+
+
+
+
 .achievement-shell .scene-background {
     filter: brightness(0.39) saturate(0.58) contrast(1.12);
 }
@@ -98,51 +102,4 @@
         min-height: 15rem;
     }
 }
-
-.achievement-panel {
-    display: block !important;
-    max-height: 65vh;
-    overflow: auto;
-    padding: 24px !important
-}
-
-.medal-gallery {
-    display: grid;
-    grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
-    gap: 16px
-}
-
-.medal-card {
-    border: 1px solid #8e7c59;
-    background: #13242ddc;
-    padding: 16px;
-    text-align: center;
-    color: #d1c4a8
-}
-
-.medal-card svg {
-    width: 80px;
-    height: 92px
-}
-
-.medal-card h3 {
-    font-size: 16px
-}
-
-.medal-card p, .medal-card details {
-    font-size: 12px;
-    line-height: 1.7
-}
-
-.medal-card.locked {
-    opacity: .55
-}
-
-.medal-card details {
-    text-align: left
-}
-
-.medal-count {
-    color: #bba87e;
-    margin-bottom: 20px
-}
+.achievement-panel{display:block!important;max-height:65vh;overflow:auto;padding:24px!important}.medal-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px}.medal-card{border:1px solid #8e7c59;background:#13242ddc;padding:16px;text-align:center;color:#d1c4a8}.medal-card svg,.medal-card img.medal-badge{width:80px;height:92px}.medal-card img.medal-badge{display:inline-block;vertical-align:middle;user-select:none;-webkit-user-drag:none}.medal-card h3{font-size:16px}.medal-card p,.medal-card details{font-size:12px;line-height:1.7}.medal-card.locked{opacity:.72}.medal-card.locked img.medal-badge,img.medal-badge.is-locked{filter:grayscale(.92) brightness(.55) contrast(.95)}.medal-card details{text-align:left}.medal-count{color:#bba87e;margin-bottom:20px}
