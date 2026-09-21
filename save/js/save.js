@@ -9,7 +9,13 @@ function formatSavedAt(value) {
     if (!value) return "时间未知";
     const date = new Date(value);
     if (!Number.isFinite(date.getTime())) return "时间未知";
-    return date.toLocaleString("zh-CN", {hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"});
+    return date.toLocaleString("zh-CN", {
+        hour12: false,
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 }
 
 function createThumb(data, id) {

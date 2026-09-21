@@ -1,7 +1,6 @@
 "use strict";
 
 
-
 const mainShell = document.getElementById("main-shell");
 const menuButtons = [...document.querySelectorAll(".menu-item")];
 const teamBrand = document.getElementById("team-brand");
@@ -9,7 +8,6 @@ const feedbackPrimary = document.getElementById("feedback-primary");
 const feedbackSecondary = document.getElementById("feedback-secondary");
 const menuFeedback = document.getElementById("menu-feedback");
 const operatorName = document.getElementById("operator-name");
-
 
 
 const menuItems = [
@@ -22,12 +20,9 @@ const menuItems = [
 ];
 
 
-
 let selectedMenuIndex = 0;
 let feedbackTimer = 0;
 let isInitializingMission = false;
-
-
 
 
 function selectMenuItem(index, shouldFocus = false) {
@@ -64,7 +59,6 @@ function activateSelectedMenuItem() {
 }
 
 
-
 function handleMenuKeyboard(event) {
     const key = event.key.toLowerCase();
 
@@ -92,7 +86,6 @@ function handleMenuKeyboard(event) {
 }
 
 
-
 function bindMenuPointerNavigation() {
     menuButtons.forEach((button, index) => {
         button.addEventListener("mouseenter", () => selectMenuItem(index));
@@ -100,7 +93,6 @@ function bindMenuPointerNavigation() {
         button.addEventListener("click", () => activateMenuAction(button.dataset.action));
     });
 }
-
 
 
 function startNewGame() {
@@ -118,7 +110,6 @@ function startNewGame() {
         MoonSystem.navigateTo("../game/index.html?new=1&entry=chapter1");
     }, 850);
 }
-
 
 
 function activateMenuAction(action) {
@@ -149,7 +140,10 @@ function activateMenuAction(action) {
 }
 
 function pickFurthestSave() {
-    const candidates = [{slot: "auto", data: MoonStorage.loadGame("auto")}, ...[1, 2, 3].map(id => ({slot: String(id), data: MoonStorage.loadGame(id)}))];
+    const candidates = [{slot: "auto", data: MoonStorage.loadGame("auto")}, ...[1, 2, 3].map(id => ({
+        slot: String(id),
+        data: MoonStorage.loadGame(id)
+    }))];
     const lineageCount = save => {
         const lineage = save && save.flags && save.flags.log_id;
         if (!lineage) return 0;
@@ -161,8 +155,12 @@ function pickFurthestSave() {
         }
     };
     const score = save => save ? (save.chapter || 0) * 100000 + (save.day || 0) * 100 + (save.playTime || 0) / 60 + (save.evidence || []).length * 5 + (save.completedTasks || []).length * 3 + lineageCount(save) * 8 : -Infinity;
-    return candidates.reduce((best, current) => score(current.data) > score(best.data) ? current : best, {slot: "", data: null});
+    return candidates.reduce((best, current) => score(current.data) > score(best.data) ? current : best, {
+        slot: "",
+        data: null
+    });
 }
+
 function openFlowchart() {
     playMenuConfirmSound();
     const best = pickFurthestSave();
@@ -198,17 +196,14 @@ function showMenuFeedback(primary, secondary, duration = 1800) {
 }
 
 
-
 function initializeOperator() {
     operatorName.textContent = MoonSystem.getCurrentOperator();
 }
 
 
-
 function initializeEntryAnimation() {
     window.requestAnimationFrame(() => mainShell.classList.add("is-ready"));
 }
-
 
 
 function playMenuMoveSound() {
@@ -224,13 +219,11 @@ function playBackSound() {
 }
 
 
-
 function bindEventListeners() {
     document.addEventListener("keydown", handleMenuKeyboard);
     teamBrand.addEventListener("click", openTeamArchive);
     bindMenuPointerNavigation();
 }
-
 
 
 function initialize() {

@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>月尽时 · 操作小游戏试玩台</title>
+    <style>
+        :root {
+            color-scheme: dark
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: #101e24;
+            color: #dfe7e2;
+            font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
+            line-height: 1.55
+        }
+
+        .wrap {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 18px 20px 40px
+        }
+
+        header h1 {
+            margin: 6px 0 6px;
+            font-size: 24px;
+            color: #dfc694;
+            letter-spacing: 2px
+        }
+
+        header .note {
+            margin: 0 0 16px;
+            font-size: 13px;
+            color: #8fa39d;
+            border-left: 3px solid #dfc694;
+            padding: 4px 0 4px 10px
+        }
+
+        .layout {
+            display: flex;
+            gap: 18px;
+            align-items: flex-start
+        }
+
+        aside.panel {
+            width: 252px;
+            flex: none;
+            background: #132026;
+            border: 1px solid #2c434a;
+            border-radius: 10px;
+            padding: 14px
+        }
+
+        aside.panel h2 {
+            margin: 12px 0 8px;
+            font-size: 14px;
+            color: #dfc694;
+            letter-spacing: 1px
+        }
+
+        aside.panel h2:first-child {
+            margin-top: 0
+        }
+
+        .game-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+
+        .game-list button {
+            display: block;
+            width: 100%;
+            text-align: left
+        }
+
+        .game-list button.active {
+            background: #3d3323;
+            border-color: #dfc694;
+            color: #f4e6c8
+        }
+
+        .diff-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 14px
+        }
+
+        .diff-group label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            background: #0d181e;
+            border: 1px solid #3a545c;
+            border-radius: 6px;
+            color: #e8dcc0;
+            padding: 7px 10px;
+            font: inherit
+        }
+
+        input:focus {
+            outline: 1px solid #dfc694
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #7e948e;
+            margin: 8px 0 0
+        }
+
+        .session-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 12px
+        }
+
+        main {
+            flex: 1;
+            min-width: 0
+        }
+
+        .stage-frame {
+            margin: 0
+        }
+
+        .minigame-stage {
+            min-height: 430px;
+            border: 1px dashed #3a545c;
+            border-radius: 10px;
+            padding: 16px;
+            background: #0d181e
+        }
+
+        .stage-empty {
+            color: #7e948e;
+            text-align: center;
+            margin-top: 180px
+        }
+
+        #minigame:fullscreen {
+            background: #101e24;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: auto
+        }
+
+        #minigame:fullscreen .minigame-stage {
+            width: 100%;
+            max-width: 860px;
+            min-height: 0
+        }
+
+        .status {
+            margin: 10px 2px 0;
+            font-size: 13px;
+            color: #9db4ae
+        }
+
+        .result-panel {
+            margin-top: 10px;
+            background: #142529;
+            border: 1px solid #6a5a35;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center
+        }
+
+        .result-panel[hidden] {
+            display: none
+        }
+
+        #result-text {
+            color: #f0dbad;
+            font-size: 14px;
+            flex: 1 1 300px
+        }
+
+        .puzzle-content h2 {
+            margin: 2px 0 6px;
+            font-size: 20px;
+            color: #dfc694
+        }
+
+        .puzzle-content > p {
+            margin: 6px 0
+        }
+
+        .puzzle-scorebar {
+            font-size: 13px;
+            color: #9db4ae;
+            margin: 6px 0
+        }
+
+        .puzzle-description {
+            color: #c8d6cd;
+            font-size: 14px
+        }
+
+        .puzzle-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+            margin-top: 10px
+        }
+
+        .puzzle-controls button small {
+            display: block;
+            font-size: 11px;
+            color: #9db4ae;
+            font-weight: 400
+        }
+
+        .difficulty-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .difficulty-options button[aria-pressed="true"] {
+            background: #3d3323;
+            border-color: #dfc694;
+            color: #f4e6c8
+        }
+
+        .difficulty-hint {
+            font-size: 12px;
+            color: #8fa39d;
+            margin: 2px 0 0
+        }
+
+        .puzzle-result {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            align-items: baseline;
+            background: #142529;
+            border: 1px solid #3a545c;
+            border-radius: 8px;
+            padding: 12px 16px
+        }
+
+        .puzzle-result b {
+            font-size: 22px;
+            color: #dfc694
+        }
+
+        .puzzle-result strong {
+            font-size: 18px;
+            color: #f0dbad
+        }
+
+        .puzzle-result span {
+            color: #9db4ae;
+            font-size: 13px
+        }
+
+        .puzzle-tutorial, .workshop-guide {
+            background: #132026;
+            border: 1px solid #2c434a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            max-width: 640px
+        }
+
+        .puzzle-tutorial h3, .workshop-guide h3 {
+            margin: 2px 0 6px;
+            font-size: 15px;
+            color: #dfc694
+        }
+
+        .puzzle-tutorial p {
+            margin: 4px 0;
+            font-size: 13px;
+            color: #c8d6cd
+        }
+
+        .action-keyhint {
+            color: #9db4ae
+        }
+
+        .action-keyhint, .action-keyrow {
+            margin: 4px 0
+        }
+
+        .action-keyrow {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap
+        }
+
+        .action-canvas {
+            width: 100%;
+            max-width: 1080px;
+            height: auto;
+            display: block;
+            background: #0c161b;
+            border: 1px solid #2c434a;
+            border-radius: 8px;
+            touch-action: none
+        }
+
+        .classic-solution {
+            background: #1b2c2a;
+            border: 1px solid #3c5747;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #c9dcc9;
+            font-size: 13px;
+            max-width: 640px
+        }
+
+        section.harness {
+            margin-top: 26px;
+            background: #132026;
+            border: 1px solid #2c434a;
+            border-radius: 10px;
+            padding: 16px
+        }
+
+        section.harness h2 {
+            margin: 0 0 8px;
+            font-size: 17px;
+            color: #dfc694;
+            letter-spacing: 1px
+        }
+
+        .summary {
+            margin: 6px 0;
+            font-size: 14px
+        }
+
+        .summary.ok {
+            color: #9dc9a8
+        }
+
+        .summary.bad {
+            color: #e08a7a
+        }
+
+        .summary.running {
+            color: #9db4ae
+        }
+
+        .progress {
+            font-size: 12px;
+            color: #7e948e;
+            margin: 4px 0 10px
+        }
+
+        .harness-table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 760px;
+            font-size: 13px
+        }
+
+        .harness-table th, .harness-table td {
+            border: 1px solid #2c434a;
+            padding: 6px 10px;
+            text-align: left
+        }
+
+        .harness-table th {
+            background: #0f1b20;
+            color: #dfc694;
+            font-weight: 600
+        }
+
+        .harness-table td:first-child {
+            color: #e8dcc0;
+            white-space: nowrap
+        }
+
+        .harness-table td.cell-bad {
+            color: #e08a7a;
+            border-color: #a05a4c
+        }
+
+        button {
+            font: inherit;
+            background: #16292f;
+            color: #dfe7e2;
+            border: 1px solid #3a545c;
+            border-radius: 6px;
+            padding: 7px 14px;
+            cursor: pointer
+        }
+
+        button:hover {
+            border-color: #dfc694;
+            color: #f4e6c8
+        }
+
+        button:disabled {
+            opacity: .45;
+            cursor: default
+        }
+
+        footer {
+            margin-top: 22px;
+            font-size: 12px;
+            color: #6d827d
+        }
+
+        @media (max-width: 860px) {
+            .layout {
+                flex-direction: column
+            }
+
+            aside.panel {
+                width: 100%
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <h1>月尽时 · 操作小游戏试玩台</h1>
+        <p class="note">正式游戏入口仍是
+            game/index.html，此页仅用于试玩与自检；全部逻辑在浏览器本地运行，不发起任何网络请求。</p>
+    </header>
+
+    <div class="layout">
+        <aside class="panel">
+            <h2>游戏列表</h2>
+            <div class="game-list" id="game-list"></div>
+            <h2>难度</h2>
+            <div class="diff-group" id="diff-group">
+                <label><input type="radio" name="test-difficulty" value="easy">轻松</label>
+                <label><input type="radio" name="test-difficulty" value="normal" checked>标准</label>
+                <label><input type="radio" name="test-difficulty" value="hard">挑战</label>
+            </div>
+            <h2>随机种子</h2>
+            <input type="text" id="seed-input" inputmode="numeric" autocomplete="off" placeholder="留空 = 每局随机">
+            <p class="hint">填写数字可复现同一布局；同一种子 + 同一难度 = 完全相同的关卡。</p>
+            <div class="session-actions">
+                <button type="button" id="btn-again">再来一局 · 新种子</button>
+                <button type="button" id="btn-retry-seed">同种子重试</button>
+                <button type="button" id="btn-quit">退出本局</button>
+            </div>
+            <p class="hint">键盘：方向键 / 空格 / 1 2 3 J K L 操作，R 重试本局。探针采样与样本扫描也可直接用鼠标。</p>
+        </aside>
+
+        <main>
+            <section id="minigame" class="stage-frame">
+                <div class="minigame-stage" id="stage"><p class="stage-empty">从左侧选择一个操作小游戏开始试玩。</p>
+                </div>
+            </section>
+            <p class="status" id="status">从左侧选择一个游戏开始试玩。</p>
+            <div class="result-panel" id="result-panel" hidden>
+                <span id="result-text"></span>
+                <button type="button" id="btn-result-again">再来一局 · 新种子</button>
+                <button type="button" id="btn-result-close">关闭</button>
+            </div>
+        </main>
+    </div>
+
+    <section class="harness">
+        <h2>引擎自检（无头 harness）</h2>
+        <p class="summary" id="harness-summary">尚未运行。将对 10 个小游戏 × 3 难度 × 种子 1–5 共 150
+            局做无头模拟（MoonAction.create + 固定步长 tick）。</p>
+        <button type="button" id="harness-run">运行引擎自检</button>
+        <p class="progress" id="harness-progress"></p>
+        <div id="harness-table"></div>
+        <p class="hint">策略：每 0.4s 随机按下一个键、0.2s 后松开（凭证分拣 / 降噪滤波额外包含槽位键 1/2/3）；泄漏巡检每 3s
+            保持 2s 空格长按并向泄漏点方向移动；进程清扫每 0.5s 点射空格；探针采样与样本扫描每 0.3s
+            把指针移向随机游走目标（≤80px）；信号对准使用读 targetF / targetA 的“作弊”闭环控制。每局最多模拟 240s
+            游戏时间。无异常即通过；断言 won 与 lost 不同时为真。</p>
+    </section>
+
+    <footer>月尽时 · 测试页 test-action.html —— 仅加载项目现有脚本，不修改任何游戏文件。</footer>
+</div>
+
+<script src="../shared/js/storage.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/puzzle-score.js"></script>
+<script src="js/classic-games.js"></script>
+<script src="js/puzzle-activities.js"></script>
+<script src="js/expanded-games.js"></script>
+<script src="js/expanded-activities.js"></script>
+<script src="js/arcade-games.js"></script>
+<script src="js/arcade-activities.js"></script>
+<script src="js/puzzle-tutorials.js"></script>
+<script src="js/tutorial-workshop.js"></script>
+<script src="js/expedition-games.js"></script>
+<script src="js/expedition-activities.js"></script>
+<script src="js/action-games.js"></script>
+<script src="js/action-activities.js"></script>
+<script src="js/puzzles.js"></script>
+<script>
+    (function () {
+        "use strict";
+
+        var GAMES = [
+            {kind: 'leak-hunt', name: '泄漏巡检'},
+            {kind: 'purge', name: '进程清扫'}
+        ];
+        var GAME_MAP = {}, KIND_SET = new Set();
+        GAMES.forEach(function (g) {
+            GAME_MAP[g.kind] = g;
+            KIND_SET.add(g.kind);
+        });
+        var DIFFS = [['easy', '轻松'], ['normal', '标准'], ['hard', '挑战']];
+        var COLORS = ['#6fb3a8', '#c9a15e', '#8f9fc0', '#b77c7c'];
+
+        var DESCRIPTIONS = {
+            'leak-hunt': '泄漏巡检：方向键移动巡检员，按空格发出脉冲，脉冲圈会照出附近的泄漏点。站在亮起的泄漏点上长按空格约 1.2 秒完成密封；舱压涨满则失败，全部密封完成。',
+            'surge-bank': '电涌调度：左右键移动接电车，接住与它同轨道落下的电涌充入计量表；满 34% 后按空格存入备用电源。过载三次失败，存满目标组数完成。',
+            'credential-sort': '凭证分拣：凭证流入中央判定窗时按槽位键——1（或 J）最高日志收「17号生物个体」，2（或 K）公开档案收「公共家庭记录 / 见证声明」，3（或 L）销毁口收「原武康签注」。送错或漏送三次失败。',
+            'stream-merge': '时间线合流：新旧记录成对流入，上下两段对齐经过中央金色闸门时按空格合流。错过三次造成撕裂即失败。',
+            'probe-steady': '探针采样：用鼠标引导探针贴住摆动的通道中线，走出通道会受击，三次受击失败；过热时按空格冷却，任其自然耗尽会损失进度。完成三次采样完成。',
+            'energy-catch': '能量合流：左右键移动滑板，接住与滑板当前颜色相同的能量珠充入电压；滑板颜色会周期切换。接到异色珠累计三次泄漏失败。',
+            'noise-filter': '降噪滤波：噪声段与语音段沿三条轨道向左流动，段进入右侧滤波窗时按所在轨道键（1/2/3 或 J/K/L）清除噪声；不要动原始语音段，空按也会累积底噪。',
+            'wave-align': '信号对准：按左右调整频率、上下调整振幅，让金色波形与目标波形重合，保持重合即可推进锁定，完成三次锁定。波形自身还会缓慢漂移。',
+            'purge': '进程清扫：方向键移动维修员，空格向最近的异常数据体开火；数据体撞到中央核心会削减其耐久，归零失败；被数据体碰到会被击退。清除目标数量完成。',
+            'scan-sweep': '样本扫描：移动鼠标（或按方向键）让扫描点缓慢划过采样区，速度过快无法确认；在每个区域持续停留即可确认，全部确认完成。',
+            'packet-run': '校验包穿行：方向键操控数据包，按顺序接触亮起的字段碎片（坐标→人数→时间→校验）；锁定瞬间会爆开一圈噪声，先躲再回。集齐四枚后右上开启上行端口，穿入即发送。被噪声击中会损坏完整性并震松最近锁定的字段。'
+        };
+        var KEYS_HINT = {
+            'leak-hunt': '方向键移动 · 空格脉冲 / 长按密封',
+            'surge-bank': '左右键移动 · 空格存入',
+            'credential-sort': '1 / 2 / 3（或 J / K / L）送入槽位',
+            'stream-merge': '空格合流',
+            'probe-steady': '鼠标引导 · 空格散热',
+            'energy-catch': '左右键移动滑板',
+            'noise-filter': '1 / 2 / 3（或 J / K / L）过滤',
+            'wave-align': '左右调频率 · 上下调振幅',
+            'purge': '方向键移动 · 空格开火',
+            'scan-sweep': '鼠标或方向键移动扫描点',
+            'packet-run': '方向键操控数据包'
+        };
+        var FEEDBACK = {
+            'leak-hunt': function (g) {
+                return '已密封 ' + g.sealed + ' / ' + g.leaks.length + ' · 舱压 ' + Math.round(g.pressure) + '%';
+            },
+            'surge-bank': function (g) {
+                return '已存入 ' + g.banked + ' 组 · 过载 ' + g.overload + ' / 3';
+            },
+            'credential-sort': function (g) {
+                return '已归档 ' + g.routed + ' · 送错 ' + g.mistakes + ' / 3';
+            },
+            'stream-merge': function (g) {
+                return '已合流 ' + g.merges + ' · 撕裂 ' + g.tears + ' / 3';
+            },
+            'probe-steady': function (g) {
+                return '采样 ' + g.samples + ' / 3 · 受击 ' + g.hits + ' / 3 · 进度 ' + Math.round(g.progress) + '%';
+            },
+            'energy-catch': function (g) {
+                return '电压 ' + g.charge + ' · 泄漏 ' + g.leaks + ' / 3';
+            },
+            'noise-filter': function (g) {
+                return '已清除 ' + g.cleaned + ' · 底噪 ' + Math.round(g.static) + ' / 100';
+            },
+            'wave-align': function (g) {
+                return '已锁定 ' + g.locks + ' / 3 · 进度 ' + Math.round(g.lockProgress) + '%';
+            },
+            'purge': function (g) {
+                return '已清除 ' + g.kills + ' · 核心耐久 ' + g.core.hp;
+            },
+            'scan-sweep': function (g) {
+                return '已确认 ' + g.found + ' / ' + g.zones.length;
+            },
+            'packet-run': function (g) {
+                return '已锁定 ' + g.locked + ' / 4 · 完整性 ' + Math.round(g.integrity) + '%' + (g.portOpen ? ' · 前往上行端口' : '');
+            }
+        };
+
+        function $(id) {
+            return document.getElementById(id);
+        }
+
+        var stage = $('stage'), statusEl = $('status'), resultPanel = $('result-panel'), resultText = $('result-text'),
+            listEl = $('game-list'), seedInput = $('seed-input');
+        var current = null, resultNoted = false;
+
+
+        function renderGuide(pz) {
+            var sec = document.createElement('section');
+            sec.className = 'puzzle-tutorial';
+            var h = document.createElement('h3');
+            h.textContent = '操作要点';
+            var pd = document.createElement('p');
+            pd.textContent = DESCRIPTIONS[pz.info.game] || '';
+            var pk = document.createElement('p');
+            pk.className = 'action-keyhint';
+            pk.textContent = '键位：' + (KEYS_HINT[pz.info.game] || '') + '。开始后按 R 可重试本局。';
+            sec.append(h, pd, pk);
+            pz.controls.append(sec);
+        }
+
+        function drawAction(pz, g) {
+            var cv = pz.actionCanvas;
+            if (!cv || !cv.isConnected) return;
+            var c = cv.getContext('2d');
+            if (!c) return;
+            var box = function (x, y, w, h, fill, stroke) {
+                if (fill) {
+                    c.fillStyle = fill;
+                    c.fillRect(x, y, w, h);
+                }
+                if (stroke) {
+                    c.strokeStyle = stroke;
+                    c.lineWidth = 1;
+                    c.strokeRect(x + .5, y + .5, w - 1, h - 1);
+                }
+            };
+            var dot = function (x, y, r, fill, stroke, lw) {
+                c.beginPath();
+                c.arc(x, y, r, 0, 6.296);
+                if (fill) {
+                    c.fillStyle = fill;
+                    c.fill();
+                }
+                if (stroke) {
+                    c.strokeStyle = stroke;
+                    c.lineWidth = lw || 2;
+                    c.stroke();
+                }
+            };
+            var label = function (t, x, y, col, align, font) {
+                c.fillStyle = col || '#e8dcc0';
+                c.font = font || '13px sans-serif';
+                c.textAlign = align || 'left';
+                c.fillText(t, x, y);
+            };
+            var bar = function (x, y, w, h, v, col) {
+                box(x, y, w, h, '#13232a', '#5b7278');
+                var f = Math.max(0, Math.min(1, v));
+                if (f > 0) box(x + 1, y + 1, (w - 2) * f, h - 2, col || '#dfc694', null);
+            };
+            box(0, 0, 600, 300, '#0c161b', null);
+            switch (g.kind) {
+                case 'leak-hunt':
+                    for (var li = 0; li < g.leaks.length; li++) {
+                        var le = g.leaks[li];
+                        if (!le.found) continue;
+                        if (!le.sealed) {
+                            var pp = 13 + 3 * Math.sin(g.elapsed * 6);
+                            dot(le.x, le.y, pp, null, 'rgba(224,196,143,' + (0.45 + 0.25 * Math.sin(g.elapsed * 6)).toFixed(3) + ')', 1);
+                        }
+                        dot(le.x, le.y, le.sealed ? 7 : 9, le.sealed ? '#567a63' : '#dfc694', le.sealed ? '#3c5747' : '#8a6f3f', 2);
+                        if (le.sealed) label('✓', le.x, le.y + 4, '#cfe3cf', 'center', '12px sans-serif');
+                    }
+                    for (var ui = 0; ui < g.pulses.length; ui++) {
+                        var u = g.pulses[ui];
+                        c.globalAlpha = Math.max(0, 1 - u.age / 1.4);
+                        dot(u.x, u.y, u.r, null, '#e0c48f', 2);
+                        c.globalAlpha = 1;
+                    }
+                    box(g.player.x - 7, g.player.y - 7, 14, 14, '#e0c48f', '#8a6f3f');
+                    bar(20, 12, 180, 10, g.pressure / 100, g.pressure > 70 ? '#c96a5a' : '#dfc694');
+                    label('舱压 ' + Math.round(g.pressure) + '%', 210, 21, '#5b7278');
+                    break;
+                case 'surge-bank':
+                    for (var i = 0; i < 4; i++) box(i * 150, 0, 150, 300, i % 2 ? '#0e1a20' : '#101e24', '#1b2c33');
+                    for (var pi = 0; pi < g.packets.length; pi++) {
+                        var pk2 = g.packets[pi];
+                        dot(pk2.lane * 150 + 75, Math.max(10, pk2.y), 10, '#c9a15e', '#7a5f33', 2);
+                    }
+                    box(g.cart * 150 + 40, 256, 70, 32, '#dfc694', '#8a6f3f');
+                    label('接电车', g.cart * 150 + 75, 277, '#22301f', 'center', '12px sans-serif');
+                    bar(20, 12, 150, 10, g.meter / 100);
+                    label('计量 ' + g.meter + '% · 已存 ' + g.banked + ' · 过载 ' + g.overload + '/3', 180, 21, '#5b7278');
+                    break;
+                case 'credential-sort': {
+                    box(260, 0, 80, 300, 'rgba(223,198,148,0.08)', '#5b7278');
+                    label('判定窗', 300, 292, '#5b7278', 'center', '11px sans-serif');
+                    var bins = [['1', 26], ['2', 126], ['3', 226]];
+                    for (var bi = 0; bi < bins.length; bi++) {
+                        box(548, bins[bi][1], 46, 44, '#142529', '#dfc694');
+                        label(bins[bi][0], 571, bins[bi][1] + 27, '#dfc694', 'center', '16px sans-serif');
+                    }
+                    label('1 最高日志 · 2 公开档案 · 3 销毁口', 16, 290, '#5b7278');
+                    for (var ci = 0; ci < g.cards.length; ci++) {
+                        var cd = g.cards[ci];
+                        box(cd.x - 24, 128, 48, 44, '#1c3138', '#3a545c');
+                        label(['17号', '签注', '公共', '见证'][cd.type], cd.x, 147, '#e8dcc0', 'center', '12px sans-serif');
+                        label('→ ' + (cd.type === 0 ? '1' : cd.type === 1 ? '3' : '2'), cd.x, 162, '#9db4ae', 'center', '11px sans-serif');
+                    }
+                    break;
+                }
+                case 'stream-merge': {
+                    box(0, 58, 600, 74, '#101e24', '#1b2c33');
+                    box(0, 168, 600, 74, '#101e24', '#1b2c33');
+                    var near = false;
+                    for (var qi = 0; qi < g.pairs.length; qi++) {
+                        var pr = g.pairs[qi];
+                        if (!pr.merged && Math.abs(pr.x - 300) <= 28) near = true;
+                    }
+                    box(297, 48, 6, 204, near ? '#dfc694' : '#31494f', null);
+                    for (var ri = 0; ri < g.pairs.length; ri++) {
+                        var pr2 = g.pairs[ri];
+                        if (pr2.merged) continue;
+                        box(pr2.x - 18, 70, 36, 50, COLORS[pr2.color], null);
+                        box(pr2.x - 18, 180, 36, 50, COLORS[pr2.color], null);
+                    }
+                    label('中央闸门 · 空格合流', 16, 290, '#5b7278');
+                    break;
+                }
+                case 'probe-steady': {
+                    var gap = [26, 20, 15][g.tier],
+                        cy = 150 + Math.sin(g.elapsed * 0.7) * 24 + Math.sin(g.elapsed * 1.13 + 2) * 12;
+                    box(60, cy - gap, 480, gap * 2, 'rgba(111,179,168,0.10)', '#31494f');
+                    box(60, cy - 1, 480, 2, '#31494f', null);
+                    dot(g.probe.x, g.probe.y, 7, '#e0c48f', '#8a6f3f', 2);
+                    label('采样 ' + g.samples + '/3 · 受击 ' + g.hits + '/3', 20, 24, '#e8dcc0');
+                    bar(20, 32, 160, 8, g.progress / 100);
+                    if (g.heat > 0) bar(20, 46, 160, 8, g.heat, '#c96a5a'); else label('探针温度正常', 20, 52, '#5b7278', 'left', '11px sans-serif');
+                    break;
+                }
+                case 'energy-catch':
+                    for (var li2 = 0; li2 < 3; li2++) box(li2 * 200, 0, 200, 300, li2 % 2 ? '#0e1a20' : '#101e24', '#1b2c33');
+                    for (var oi = 0; oi < g.orbs.length; oi++) {
+                        var o = g.orbs[oi];
+                        dot(o.lane * 200 + 100, Math.max(12, o.y), 11, COLORS[o.color], '#223038', 2);
+                    }
+                    box(g.sled.lane * 200 + 60, 252, 80, 34, COLORS[g.sled.color], '#223038');
+                    label('电压 ' + g.charge + ' · 泄漏 ' + g.leaks + '/3 · 换色倒计时 ' + Math.max(0, Math.ceil(g.colorT)) + 's', 16, 290, '#5b7278');
+                    break;
+                case 'noise-filter': {
+                    box(430, 6, 70, 288, null, '#dfc694');
+                    label('滤波窗', 465, 296, '#dfc694', 'center', '11px sans-serif');
+                    for (var ni = 0; ni < 3; ni++) box(0, 30 + ni * 100, 600, 40, '#101e24', '#1b2c33');
+                    for (var mi = 0; mi < g.packets.length; mi++) {
+                        var np = g.packets[mi];
+                        var ny = 50 + np.lane * 100;
+                        if (np.type === 'noise') box(np.x - 16, ny - 12, 32, 24, '#7c4a44', '#a4655c');
+                        else dot(np.x, ny, 12, '#cbb8a0', '#84765f', 2);
+                    }
+                    break;
+                }
+                case 'wave-align': {
+                    var wave = function (f, a, col, lw) {
+                        c.beginPath();
+                        c.strokeStyle = col;
+                        c.lineWidth = lw;
+                        for (var x = 0; x <= 600; x += 6) {
+                            var y = 150 - Math.sin(x / 600 * 12.566 * f) * a * 95;
+                            if (x === 0) c.moveTo(x, y); else c.lineTo(x, y);
+                        }
+                        c.stroke();
+                    };
+                    wave(g.targetF, g.targetA, '#5b7278', 2);
+                    wave(g.freq, g.amp, '#e0c48f', 3);
+                    bar(20, 20, 200, 10, g.lockProgress / 100);
+                    label('锁定 ' + g.locks + '/3 · ←→ 频率 · ↑↓ 振幅', 20, 46, '#5b7278');
+                    break;
+                }
+                case 'purge':
+                    dot(300, 150, 26, '#1c3138', g.core.hp > 40 ? '#6fb3a8' : '#c96a5a', 3);
+                    label('核心 ' + g.core.hp, 300, 154, '#e8dcc0', 'center', '12px sans-serif');
+                    for (var bli = 0; bli < g.blobs.length; bli++) {
+                        var bl = g.blobs[bli];
+                        dot(bl.x, bl.y, bl.r, '#5a3f4a', '#8a5a66', 2);
+                    }
+                    for (var si = 0; si < g.shots.length; si++) {
+                        var s2 = g.shots[si];
+                        dot(s2.x, s2.y, 3, '#e0c48f', null);
+                    }
+                    box(g.player.x - 8, g.player.y - 8, 16, 16, '#dfc694', '#8a6f3f');
+                    break;
+                case 'packet-run':
+                    c.strokeStyle = g.portOpen ? '#dfc694' : '#5b7278';
+                    c.setLineDash([5, 4]);
+                    c.beginPath();
+                    c.arc(g.port.x, g.port.y, 22, 0, 6.2832);
+                    c.stroke();
+                    c.setLineDash([]);
+                    label(g.portOpen ? '端口已开启' : '端口未开启', g.port.x, g.port.y - 34, g.portOpen ? '#dfc694' : '#5b7278', 'center', '11px sans-serif');
+                    for (var pni = 0; pni < g.noises.length; pni++) {
+                        var pn = g.noises[pni];
+                        dot(pn.x, pn.y, pn.r, '#7c4a44', '#a4655c', 2);
+                    }
+                    for (varshi = 0; shi < g.shards.length; shi++) {
+                        var sd = g.shards[shi];
+                        if (sd.locked) {
+                            dot(g.player.x + Math.cos(pz.time * 1.6 + shi * 1.5708) * 26, g.player.y + Math.sin(pz.time * 1.6 + shi * 1.5708) * 26, 8, '#dfc694', '#8a6f3f', 1);
+                        } else {
+                            dot(sd.x, sd.y, 10, '#6fae9f', '#3f5a53', 2);
+                            label(sd.label, sd.x, sd.y + 4, '#e8dcc0', 'center', '11px sans-serif');
+                        }
+                    }
+                    dot(g.player.x, g.player.y, 12, '#dfc694', '#8a6f3f', 2);
+                    label('锁定 ' + g.locked + '/4 · 完整性 ' + Math.round(g.integrity) + '%', 16, 290, '#5b7278');
+                    break;
+                case 'scan-sweep':
+                    for (var zi = 0; zi < g.zones.length; zi++) {
+                        var z = g.zones[zi];
+                        if (z.found) {
+                            dot(z.x, z.y, z.r, null, '#7fae8f', 2);
+                            label('✓', z.x, z.y + 4, '#7fae8f', 'center', '13px sans-serif');
+                        } else if (z.hint) {
+                            c.setLineDash([6, 5]);
+                            dot(z.x, z.y, z.r, null, '#8a6f3f', 2);
+                            c.setLineDash([]);
+                        } else {
+                            c.globalAlpha = 0.12;
+                            dot(z.x, z.y, z.r * 0.35, null, '#5b7278', 1);
+                            c.globalAlpha = 1;
+                        }
+                        if (z.progress > 0 && !z.found) {
+                            c.beginPath();
+                            c.strokeStyle = '#dfc694';
+                            c.lineWidth = 3;
+                            c.arc(z.x, z.y, z.r - 4, -1.5708, -1.5708 + z.progress / 100 * 6.2832);
+                            c.stroke();
+                            c.lineWidth = 1;
+                        }
+                    }
+                    dot(g.pointer.x, g.pointer.y, 9, null, 'rgba(91,114,120,0.6)', 1);
+                    dot(g.scan.x, g.scan.y, 5, '#e0c48f', null);
+                    break;
+            }
+            if (pz.feedback && FEEDBACK[g.kind]) pz.feedback.textContent = FEEDBACK[g.kind](g);
+        }
+
+        function renderAction(pz, g) {
+            pz.description.textContent = DESCRIPTIONS[pz.info.game] || '';
+            var cv = document.createElement('canvas');
+            cv.width = 600;
+            cv.height = 300;
+            cv.className = 'action-canvas';
+            cv.setAttribute('aria-label', pz.info.title || pz.info.game);
+            pz.controls.append(cv);
+            pz.actionCanvas = cv;
+            var kind = g.kind;
+            if (kind === 'credential-sort' || kind === 'noise-filter') {
+                var row = document.createElement('div');
+                row.className = 'action-keyrow';
+                var slotKeys = [['1', 'Digit1'], ['2', 'Digit2'], ['3', 'Digit3'], ['J', 'KeyJ'], ['K', 'KeyK'], ['L', 'KeyL']];
+                slotKeys.forEach(function (pair) {
+                    pz.button(pair[0], function () {
+                        MoonActivities.expandedKey(pz, pair[1]);
+                    }, row);
+                });
+                pz.controls.append(row);
+            }
+            if (['leak-hunt', 'surge-bank', 'stream-merge', 'purge', 'probe-steady'].indexOf(kind) >= 0) {
+                var srow = document.createElement('div');
+                srow.className = 'action-keyrow';
+                var sp = pz.button('空格（按住生效）', function () {
+                }, srow);
+                sp.addEventListener('pointerdown', function (e) {
+                    e.preventDefault();
+                    MoonActivities.expandedKey(pz, 'Space');
+                });
+                ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) {
+                    sp.addEventListener(ev, function () {
+                        if (MoonActivities.newRelease) MoonActivities.newRelease(pz, 'Space');
+                    });
+                });
+                pz.controls.append(srow);
+            }
+            if (kind === 'probe-steady' || kind === 'scan-sweep') {
+                var toPoint = function (cx, cy) {
+                    var r = cv.getBoundingClientRect();
+                    MoonAction.point(g, (cx - r.left) / r.width * 600, (cy - r.top) / r.height * 300);
+                };
+                cv.addEventListener('mousemove', function (e) {
+                    toPoint(e.clientX, e.clientY);
+                });
+                cv.addEventListener('touchmove', function (e) {
+                    var t = e.touches[0];
+                    if (!t) return;
+                    e.preventDefault();
+                    toPoint(t.clientX, t.clientY);
+                }, {passive: false});
+            }
+            drawAction(pz, g);
+        }
+
+        function installActionLayer() {
+            if (typeof MoonAction === 'undefined' || typeof MoonActivities === 'undefined' || typeof MoonTutorials === 'undefined') {
+                console.warn('[test-action] 引擎脚本未加载完整，试玩功能不可用。');
+                return false;
+            }
+            if (MoonActivities.descriptions && MoonActivities.descriptions['leak-hunt']) {
+                console.info('[test-action] 检测到项目已提供新游戏渲染层（action-activities.js），使用项目自带实现。');
+                return true;
+            }
+            if (MoonActivities.__testActionFallback) return true;
+            MoonActivities.__testActionFallback = true;
+            var a = MoonActivities;
+            var base = {
+                reset: a.reset,
+                render: a.render,
+                tick: a.tick,
+                reveal: a.reveal,
+                key: a.expandedKey,
+                release: a.newRelease
+            };
+            Object.assign(a.descriptions, DESCRIPTIONS);
+            var own = function (g) {
+                return !!(g && KIND_SET.has(g.kind));
+            };
+            a.reset = function (pz) {
+                if (!KIND_SET.has(pz.info.game)) return base.reset.call(this, pz);
+                pz.classic = MoonAction.create(pz.info.game, {seed: pz.seed, difficulty: pz.difficulty});
+                pz.history = [];
+            };
+            a.render = function (pz) {
+                var g = pz.classic;
+                if (!own(g)) return base.render.call(this, pz);
+                renderAction(pz, g);
+            };
+            a.tick = function (pz, dt) {
+                var g = pz.classic;
+                if (!own(g)) return base.tick.call(this, pz, dt);
+                MoonAction.tick(g, dt);
+                drawAction(pz, g);
+                if (g.won) this.complete(pz);
+                else if (g.lost) pz.finish(false);
+            };
+            a.expandedKey = function (pz, code) {
+                var g = pz.classic;
+                if (!own(g)) return base.key.call(this, pz, code);
+                if (!pz.started || pz.result) return false;
+                return MoonAction.press(g, code);
+            };
+            a.newRelease = function (pz, code) {
+                var g = pz.classic;
+                if (!own(g)) return typeof base.release === 'function' ? base.release.call(this, pz, code) : undefined;
+                return MoonAction.release(g, code);
+            };
+            a.reveal = function (pz) {
+                var g = pz.classic;
+                if (!own(g)) return base.reveal.call(this, pz);
+                MoonAction.assist(g);
+                var el = document.createElement('div');
+                el.className = 'classic-solution';
+                el.textContent = g.assistText || '辅助程序已接管当前局面。';
+                pz.controls.append(el);
+                drawAction(pz, g);
+            };
+            var prevGuide = MoonTutorials.render;
+            MoonTutorials.render = function (pz) {
+                if (!own(pz.classic)) return prevGuide.call(this, pz);
+                renderGuide(pz);
+            };
+            console.info('[test-action] 本副本未包含 js/action-activities.js，已启用内置试玩渲染层（仅本页生效，未改动任何项目文件）。');
+            return true;
+        }
+
+        var actionLayerActive = installActionLayer();
+
+
+        var puzzles = new MoonPuzzles(stage, onSessionFinish);
+
+        function readSeed() {
+            var v = seedInput.value.trim();
+            if (!v) return undefined;
+            var n = Number(v);
+            return Number.isFinite(n) ? n : undefined;
+        }
+
+        function readDifficulty() {
+            var el = document.querySelector('input[name="test-difficulty"]:checked');
+            return el ? el.value : 'normal';
+        }
+
+        function hideResult() {
+            resultNoted = false;
+            resultPanel.hidden = true;
+        }
+
+        function openGame(kind, opts) {
+            opts = opts || {};
+            var meta = GAME_MAP[kind];
+            if (!meta) return;
+            current = kind;
+            hideResult();
+            puzzles.open({
+                node: 'TEST_' + kind,
+                game: kind,
+                title: meta.name + ' · 试玩'
+            }, {seed: ('seed' in opts) ? opts.seed : readSeed(), difficulty: readDifficulty()});
+            var buttons = listEl.querySelectorAll('button');
+            for (var i = 0; i < buttons.length; i++) buttons[i].classList.toggle('active', buttons[i].dataset.kind === kind);
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+            syncStatus(true);
+        }
+
+        function showResult(result) {
+            if (!current) return;
+            var meta = GAME_MAP[current];
+            resultText.textContent = meta.name + ' · ' + (result.success ? '完成' : '未完成') + ' · 评级 ' + result.grade + ' · ' + result.score + ' / 1000 分 · 准确率 ' + result.accuracy + '% · 失误 ' + result.errors + ' 次';
+            resultPanel.hidden = false;
+        }
+
+        function onSessionFinish(node, result) {
+            showResult(result);
+        }
+
+        function buildGameList() {
+            GAMES.forEach(function (g) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.textContent = g.name;
+                b.dataset.kind = g.kind;
+                b.addEventListener('click', function () {
+                    openGame(g.kind);
+                });
+                listEl.append(b);
+            });
+        }
+
+        $('btn-again').addEventListener('click', function () {
+            if (current) openGame(current, {seed: undefined});
+        });
+        $('btn-retry-seed').addEventListener('click', function () {
+            if (!current) return;
+            if (puzzles.running) puzzles.retry();
+            else openGame(current, {seed: puzzles.seed});
+        });
+        $('btn-quit').addEventListener('click', function () {
+            puzzles.abort();
+            hideResult();
+            syncStatus(true);
+        });
+        $('btn-result-again').addEventListener('click', function () {
+            if (current) openGame(current, {seed: undefined});
+        });
+        $('btn-result-close').addEventListener('click', hideResult);
+
+        var lastStatus = '';
+
+        function syncStatus(force) {
+            var rd = document.querySelector('input[name="test-difficulty"]:checked');
+            if (puzzles.info && rd && rd.value !== puzzles.difficulty) {
+                var want = document.querySelector('input[name="test-difficulty"][value="' + puzzles.difficulty + '"]');
+                if (want) want.checked = true;
+            }
+            var text;
+            if (!puzzles.info) text = '从左侧选择一个游戏开始试玩。';
+            else if (puzzles.result) text = puzzles.info.title + ' · 已结束 · ' + (puzzles.result.success ? '成功' : '失败') + ' · ' + puzzles.result.score + ' / 1000 分 · 评级 ' + puzzles.result.grade;
+            else if (!puzzles.running) text = puzzles.info.title + ' · 已退出本局，可重新选择游戏或再来一局。';
+            else if (!puzzles.started) text = puzzles.info.title + ' · 种子 ' + puzzles.seed + ' · 规则说明中，点「准备好了，开始」进入游戏。';
+            else text = puzzles.info.title + ' · 种子 ' + puzzles.seed + ' · 剩余 ' + Math.max(0, Math.ceil(puzzles.remaining)) + ' 秒 · 得分 ' + puzzles.scoring.score;
+            if (force || text !== lastStatus) {
+                lastStatus = text;
+                statusEl.textContent = text;
+            }
+        }
+
+
+        var lastFrame = performance.now();
+
+        function frame(now) {
+            var dt = Math.min(0.1, Math.max(0, (now - lastFrame) / 1000));
+            lastFrame = now;
+            puzzles.tick(dt);
+            syncStatus(false);
+            if (puzzles.running && puzzles.result && !resultNoted) {
+                resultNoted = true;
+                showResult(puzzles.result);
+            }
+            requestAnimationFrame(frame);
+        }
+
+
+        var PREVENT = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'];
+        window.addEventListener('keydown', function (e) {
+            var el = document.activeElement;
+            if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable)) return;
+            if (PREVENT.indexOf(e.code) >= 0) e.preventDefault();
+            if (e.repeat) return;
+            if (typeof MoonSound !== 'undefined' && MoonSound.unlock) MoonSound.unlock();
+            if (e.code === 'KeyR') {
+                puzzles.retry();
+                return;
+            }
+            puzzles.key(e.code);
+        });
+        window.addEventListener('keyup', function (e) {
+            if (typeof MoonActivities !== 'undefined' && MoonActivities.newRelease) MoonActivities.newRelease(puzzles, e.code);
+        });
+
+
+        var HARNESS = {diffs: ['easy', 'normal', 'hard'], seeds: [1, 2, 3, 4, 5], maxTime: 240};
+        var ARROWS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+        var BASE_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'];
+        var SLOT_KEYS = ['Digit1', 'Digit2', 'Digit3'];
+        var harnessStats = {}, harnessRunning = false;
+
+        function keyPoolFor(kind) {
+            if (kind === 'credential-sort' || kind === 'noise-filter') return BASE_KEYS.concat(SLOT_KEYS);
+            if (kind === 'leak-hunt' || kind === 'purge') return ARROWS.slice();
+            return BASE_KEYS.slice();
+        }
+
+        function simulateAction(kind, diff, seed) {
+            var g = MoonAction.create(kind, {seed: seed, difficulty: diff});
+            if (!g || g.kind !== kind) throw new Error('MoonAction.create 返回异常状态');
+            var held = new Set(), sched = [];
+            var press = function (k) {
+                if (!held.has(k)) {
+                    held.add(k);
+                    MoonAction.press(g, k);
+                }
+            };
+            var release = function (k) {
+                if (held.has(k)) {
+                    held.delete(k);
+                    MoonAction.release(g, k);
+                }
+            };
+            var pool = keyPoolFor(kind);
+            var st = {
+                nextMove: 0,
+                nextPoint: 0,
+                nextShoot: 0,
+                nextTarget: 0,
+                px: 300,
+                py: 150,
+                tf: 0,
+                ta: 0,
+                violation: false
+            };
+            var frames = 0;
+            while (!g.won && !g.lost && g.elapsed < HARNESS.maxTime) {
+                var t = g.elapsed, dt = 1 / 60;
+                for (var i = sched.length - 1; i >= 0; i--) {
+                    if (sched[i].t <= t) {
+                        release(sched[i].key);
+                        sched.splice(i, 1);
+                    }
+                }
+                if (kind === 'wave-align') {
+
+                    if (t >= st.nextTarget) {
+                        st.nextTarget = t + 0.5;
+                        st.tf = g.targetF;
+                        st.ta = g.targetA;
+                    }
+                    var fd = [0.22, 0.3, 0.4][g.tier] / 60 * 1.6, ad = 0.15 / 60 * 1.6, want = [];
+                    if (g.freq < st.tf - fd) want.push('ArrowRight'); else if (g.freq > st.tf + fd) want.push('ArrowLeft');
+                    if (g.amp < st.ta - ad) want.push('ArrowUp'); else if (g.amp > st.ta + ad) want.push('ArrowDown');
+                    for (var w1 = 0; w1 < want.length; w1++) MoonAction.press(g, want[w1]);
+                    MoonAction.tick(g, dt);
+                    for (var w2 = 0; w2 < want.length; w2++) MoonAction.release(g, want[w2]);
+                } else {
+                    if (t >= st.nextMove) {
+                        st.nextMove = t + 0.4;
+                        var key;
+                        if (kind === 'leak-hunt') {
+                            var best = null, bd = 1e9;
+                            for (var li = 0; li < g.leaks.length; li++) {
+                                var le = g.leaks[li];
+                                if (le.sealed) continue;
+                                var d = Math.hypot(le.x - g.player.x, le.y - g.player.y);
+                                if (d < bd) {
+                                    bd = d;
+                                    best = le;
+                                }
+                            }
+                            if (best && bd > 4 && Math.random() < 0.7) {
+                                var dx = best.x - g.player.x, dy = best.y - g.player.y;
+                                key = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft') : (dy > 0 ? 'ArrowDown' : 'ArrowUp');
+                            } else key = ARROWS[Math.floor(Math.random() * 4)];
+                        } else if (kind === 'packet-run') {
+
+                            var cur = g.shards[g.order];
+                            var tgt = cur && !cur.locked ? cur : g.port;
+                            var ddx = tgt.x - g.player.x, ddy = tgt.y - g.player.y;
+                            if (Math.hypot(ddx, ddy) > 6) key = Math.abs(ddx) > Math.abs(ddy) ? (ddx > 0 ? 'ArrowRight' : 'ArrowLeft') : (ddy > 0 ? 'ArrowDown' : 'ArrowUp');
+                            else key = ARROWS[Math.floor(Math.random() * 4)];
+                        } else key = pool[Math.floor(Math.random() * pool.length)];
+                        press(key);
+                        sched.push({t: t + 0.2, key: key});
+                    }
+                    if (kind === 'leak-hunt') {
+
+                        var on = (t % 3) < 2;
+                        if (on && !held.has('Space')) press('Space');
+                        else if (!on && held.has('Space')) release('Space');
+                    }
+                    if (kind === 'purge' && t >= st.nextShoot) {
+                        st.nextShoot = t + 0.5;
+                        press('Space');
+                        sched.push({t: t + 0.1, key: 'Space'});
+                    }
+                    if ((kind === 'probe-steady' || kind === 'scan-sweep') && t >= st.nextPoint) {
+
+                        st.nextPoint = t + 0.3;
+                        var ang = Math.random() * Math.PI * 2, dist = Math.random() * 80;
+                        st.px = Math.max(0, Math.min(600, st.px + Math.cos(ang) * dist));
+                        st.py = Math.max(0, Math.min(300, st.py + Math.sin(ang) * dist));
+                        MoonAction.point(g, st.px, st.py);
+                    }
+                    MoonAction.tick(g, dt);
+                }
+                if (g.won && g.lost) {
+                    st.violation = true;
+                    break;
+                }
+                if (++frames > 14405) break;
+            }
+            if (g.won && g.lost) st.violation = true;
+            return {won: !!g.won, lost: !!g.lost, timeout: !g.won && !g.lost, violation: st.violation};
+        }
+
+        function initHarnessStats() {
+            GAMES.forEach(function (g) {
+                harnessStats[g.kind] = {};
+                HARNESS.diffs.forEach(function (d) {
+                    harnessStats[g.kind][d] = {pass: 0, won: 0, lost: 0, timeout: 0, errors: []};
+                });
+            });
+        }
+
+        function buildHarnessTable() {
+            var host = $('harness-table');
+            host.replaceChildren();
+            var tbl = document.createElement('table');
+            tbl.className = 'harness-table';
+            var thead = document.createElement('thead');
+            var hr = document.createElement('tr');
+            ['游戏', '轻松', '标准', '挑战'].forEach(function (t) {
+                var th = document.createElement('th');
+                th.textContent = t;
+                hr.append(th);
+            });
+            thead.append(hr);
+            tbl.append(thead);
+            var tbody = document.createElement('tbody');
+            GAMES.forEach(function (g) {
+                var tr = document.createElement('tr');
+                var td = document.createElement('td');
+                td.textContent = g.name;
+                tr.append(td);
+                HARNESS.diffs.forEach(function (d) {
+                    var td2 = document.createElement('td');
+                    td2.id = 'harness-' + g.kind + '-' + d;
+                    td2.textContent = '—';
+                    tr.append(td2);
+                });
+                tbody.append(tr);
+            });
+            tbl.append(tbody);
+            host.append(tbl);
+        }
+
+        function updateHarnessCell(kind, diff) {
+            var s = harnessStats[kind][diff], cell = $('harness-' + kind + '-' + diff);
+            if (!cell) return;
+            var txt = s.pass + ' / ' + HARNESS.seeds.length;
+            if (s.won || s.lost || s.timeout) txt += ' · 胜' + s.won + ' 负' + s.lost + ' 超' + s.timeout;
+            if (s.errors.length) txt += ' · 异常' + s.errors.length;
+            cell.textContent = txt;
+            if (s.errors.length) {
+                cell.classList.add('cell-bad');
+                cell.title = s.errors.join('\n');
+            }
+        }
+
+        function runHarnessOne(job) {
+            var s = harnessStats[job.kind][job.diff];
+            try {
+                var r = simulateAction(job.kind, job.diff, job.seed);
+                s.pass++;
+                if (r.won) s.won++; else if (r.lost) s.lost++; else s.timeout++;
+                if (r.violation) s.errors.push('won 与 lost 同时为真（seed ' + job.seed + '）');
+            } catch (err) {
+                s.errors.push(((err && err.message) ? err.message : String(err)) + '（seed ' + job.seed + '）');
+                if (console.error) console.error('[test-action] 自检异常：', job.kind, job.diff, job.seed, err);
+            }
+        }
+
+        function runHarness() {
+            if (harnessRunning) return;
+            harnessRunning = true;
+            initHarnessStats();
+            buildHarnessTable();
+            var btn = $('harness-run'), summary = $('harness-summary');
+            btn.disabled = true;
+            summary.textContent = '引擎自检运行中…';
+            summary.className = 'summary running';
+            var jobs = [];
+            GAMES.forEach(function (g) {
+                HARNESS.diffs.forEach(function (d) {
+                    HARNESS.seeds.forEach(function (seed) {
+                        jobs.push({kind: g.kind, diff: d, seed: seed});
+                    });
+                });
+            });
+            var i = 0, total = jobs.length;
+
+            function step() {
+                var t0 = performance.now();
+                while (i < total && performance.now() - t0 < 10) {
+                    var j = jobs[i++];
+                    runHarnessOne(j);
+                    updateHarnessCell(j.kind, j.diff);
+                }
+                $('harness-progress').textContent = '进度：' + i + ' / ' + total + ' 局（' + GAMES.length + ' 类 × 3 难度 × 5 种子）';
+                if (i < total) {
+                    setTimeout(step, 0);
+                    return;
+                }
+                harnessRunning = false;
+                btn.disabled = false;
+                var fail = 0, msgs = [];
+                GAMES.forEach(function (g) {
+                    HARNESS.diffs.forEach(function (d) {
+                        var s = harnessStats[g.kind][d];
+                        if (s.errors.length) {
+                            fail += s.errors.length;
+                            s.errors.slice(0, 2).forEach(function (m) {
+                                msgs.push(g.name + '·' + d + '：' + m);
+                            });
+                        }
+                    });
+                });
+                var ok = fail === 0;
+                summary.textContent = ok
+                    ? '引擎自检：通过 · ' + total + ' / ' + total + ' 局无异常，won 与 lost 未同时为真。'
+                    : '引擎自检：异常 · ' + fail + ' 局失败。' + msgs.slice(0, 4).join(' ｜ ');
+                summary.className = 'summary ' + (ok ? 'ok' : 'bad');
+                var log = {verdict: ok ? '通过' : '异常', failRuns: fail, totalRuns: total, details: harnessStats};
+                if (msgs.length) log.firstMessages = msgs;
+                console.log('[test-action] 引擎自检汇总：', log);
+            }
+
+            setTimeout(step, 0);
+        }
+
+        $('harness-run').addEventListener('click', runHarness);
+
+
+        buildGameList();
+        initHarnessStats();
+        buildHarnessTable();
+        syncStatus(true);
+        requestAnimationFrame(frame);
+        if (!actionLayerActive) {
+            statusEl.textContent = '引擎脚本未加载完整：请确认本页与 game/js、shared/js 目录结构保持相对位置后重新打开。';
+        }
+    })();
+</script>
+</body>
+</html>

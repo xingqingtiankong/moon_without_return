@@ -37,7 +37,7 @@
     <path d="M29.4 55 H50.6 L56.4 86.4 L40 79.4 L23.6 86.4 Z" fill="#000000"/>
     <path d="M70.36 21.34 A33.5 33.5 0 1 1 56.75 6.49 L54.80 9.87 A29.6 29.6 0 1 0 66.83 22.99 Z" fill="#000000"/>
   </g>
-
+  
   <path d="M29.4 55 H50.6 L56.4 86.4 L40 79.4 L23.6 86.4 Z" fill="url(#rb-b04)" stroke="#6f5729" stroke-width=".6" stroke-linejoin="round"/>
   <path d="M29.4 55 L23.6 86.4 L30.6 86.9 L35.6 55 Z" fill="#000000" opacity=".22"/>
   <path d="M50.6 55 L56.4 86.4 L49.4 86.9 L44.4 55 Z" fill="#ffffff" opacity=".07"/>

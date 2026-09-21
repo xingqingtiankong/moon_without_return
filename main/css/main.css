@@ -1,13 +1,7 @@
 
-
-
-
 .main-shell {
     --menu-width: clamp(18rem, 25vw, 25rem);
 }
-
-
-
 
 
 .main-shell .scene-background {
@@ -21,15 +15,9 @@
 }
 
 
-
-
-
 .main-shell .ambient-dust {
     opacity: 0.14;
 }
-
-
-
 
 
 .team-brand {
@@ -79,9 +67,6 @@
 }
 
 
-
-
-
 .game-identity {
     position: absolute;
     z-index: 5;
@@ -123,9 +108,6 @@
 .game-identity__signal::after {
     transform: scaleX(-1);
 }
-
-
-
 
 
 .main-menu {
@@ -331,9 +313,6 @@
 }
 
 
-
-
-
 .operator-hud,
 .communication-hud {
     position: absolute;
@@ -363,9 +342,6 @@
 }
 
 
-
-
-
 @keyframes logoReveal {
     to {
         opacity: 1;
@@ -386,9 +362,6 @@
         transform: translateY(0);
     }
 }
-
-
-
 
 
 @media (max-height: 800px) and (min-width: 761px) {

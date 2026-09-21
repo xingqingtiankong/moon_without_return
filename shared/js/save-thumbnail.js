@@ -105,7 +105,10 @@
         ctx.fill();
         ctx.restore();
 
-        const drawSize = config.getCharacterDrawSize ? config.getCharacterDrawSize(scene.mapId) : {width: 120, height: 120};
+        const drawSize = config.getCharacterDrawSize ? config.getCharacterDrawSize(scene.mapId) : {
+            width: 120,
+            height: 120
+        };
         const drawWidth = drawSize.width * scaleX;
         const drawHeight = drawSize.height * scaleY;
         const facingRow = Number.isInteger(scene.facingRow) ? Math.max(0, Math.min(7, scene.facingRow)) : 0;

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../shared/css/base.css">
     <link rel="stylesheet" href="./css/game.css">
     <link rel="stylesheet" href="./css/expedition.css">
+    <link rel="stylesheet" href="./css/action.css">
     <link rel="stylesheet" href="../shared/css/in-game-theme.css">
     <script src="../shared/js/storage.js" defer></script>
     <script src="../shared/js/display-settings.js" defer></script>
@@ -24,15 +25,16 @@
     <script src="./js/chapters23.js" defer></script>
     <script src="./js/evidence.js" defer></script>
     <script src="./js/chapters-final.js" defer></script>
-<script src="../shared/js/endings.js" defer></script>
-<script src="./js/branches-v5.js" defer></script>
-<script src="./js/dialogue-overrides.js" defer></script>
-<script src="./js/task-stations.js" defer></script>
+    <script src="../shared/js/endings.js" defer></script>
+    <script src="./js/branches-v5.js" defer></script>
+    <script src="./js/dialogue-overrides.js" defer></script>
+    <script src="./js/task-stations.js" defer></script>
     <script src="./js/legacy-v5.js" defer></script>
     <script src="./js/final-forms.js" defer></script>
     <script src="./js/final-scenes.js" defer></script>
     <script src="./js/chapter-media.js" defer></script>
     <script src="./js/sound.js" defer></script>
+    <script src="./js/ending-bgm.js" defer></script>
     <script src="./js/puzzle-score.js" defer></script>
     <script src="./js/classic-games.js" defer></script>
     <script src="./js/puzzle-activities.js" defer></script>
@@ -44,6 +46,8 @@
     <script src="./js/tutorial-workshop.js" defer></script>
     <script src="./js/expedition-games.js" defer></script>
     <script src="./js/expedition-activities.js" defer></script>
+    <script src="./js/action-games.js?v=6" defer></script>
+    <script src="./js/action-activities.js?v=6" defer></script>
     <script src="./js/activity-art.js" defer></script>
     <script src="./js/puzzles.js" defer></script>
     <script src="./js/activity-motion.js" defer></script>
@@ -54,23 +58,24 @@
     <script src="./js/family-animation.js" defer></script>
     <script src="./js/family-patrol.js" defer></script>
     <script src="./js/score-v6.js" defer></script>
-<script src="./js/polish-v6.js" defer></script>
-<script src="./js/teaching-v6.js" defer></script><script src="./js/pipe-guide-v6.js" defer></script>
-<script src="./js/drag-v6.js" defer></script>
-<script src="./js/merge-motion-v6.js" defer></script>
-<script src="./js/history-v6.js" defer></script>
-<script src="./js/chapter1-expressions.js" defer></script>
-<script src="./js/later-expressions.js" defer></script>
-<script src="./js/dialogue-scopes.js" defer></script>
-<script src="./js/dialogue-data.js" defer></script>
-<script src="../shared/js/save-thumbnail.js" defer></script>
-<script src="./js/game.js" defer></script>
-<script src="./js/test-history-ui-v6.js" defer></script>
-<script src="./js/story-flow-data-v5.js" defer></script>
-<script src="./js/story-flow-v7.js" defer></script>
+    <script src="./js/polish-v6.js" defer></script>
+    <script src="./js/teaching-v6.js" defer></script>
+    <script src="./js/pipe-guide-v6.js" defer></script>
+    <script src="./js/drag-v6.js" defer></script>
+    <script src="./js/merge-motion-v6.js" defer></script>
+    <script src="./js/history-v6.js" defer></script>
+    <script src="./js/chapter1-expressions.js" defer></script>
+    <script src="./js/later-expressions.js" defer></script>
+    <script src="./js/dialogue-scopes.js" defer></script>
+    <script src="./js/dialogue-data.js" defer></script>
+    <script src="../shared/js/save-thumbnail.js" defer></script>
+    <script src="./js/game.js" defer></script>
+    <script src="./js/test-history-ui-v7.js" defer></script>
+    <script src="./js/story-flow-data-v5.js" defer></script>
+    <script src="./js/story-flow-v7.js?v=9" defer></script>
     <script src="./js/ending-ui.js" defer></script>
-<link rel="stylesheet" href="./css/polish-v6.css">
-<link rel="stylesheet" href="./css/story-flow-v8.css">
+    <link rel="stylesheet" href="./css/polish-v6.css">
+    <link rel="stylesheet" href="./css/story-flow-v8.css?v=5">
 </head>
 <body>
 <main class="map-game" id="map-game">
@@ -80,6 +85,12 @@
     <aside id="story-detail" class="story-detail" hidden aria-label="正在查看的物件"></aside>
     <canvas id="scene" width="1672" height="941" aria-label="地图探索场景"></canvas>
     <div class="screen-shade" aria-hidden="true"></div>
+
+    <aside class="mental-hud" id="mental-hud" aria-live="polite" hidden>
+        <small>MENTAL / 精神</small>
+        <strong><span id="mental-value">100</span><em>%</em></strong>
+        <div class="mental-hud__bar" aria-hidden="true"><i id="mental-bar"></i></div>
+    </aside>
 
     <header class="location-hud" aria-label="当前位置" data-status-hud aria-live="polite" hidden>
         <small><span class="dev-mark">DEV</span><span id="chapter-day">第一章 · 第一天</span></small>
@@ -144,14 +155,19 @@
 
     <section class="dialogue-layer ui-layer" id="dialogue" hidden role="dialog" aria-modal="true"
              aria-labelledby="dialogue-speaker">
-        <img id="dialogue-portrait" src="../img/characters/azhi/azhi-portrait.png" alt="阿芷">
+        <img id="dialogue-portrait" src="../img/characters/azhi/expressions/smile.png" alt="阿芷">
         <div class="dialogue-box" aria-live="polite">
             <header><strong id="dialogue-speaker">阿芷</strong><span id="dialogue-role">妻子</span><i class="dev-mark">DEV
                 示例</i></header>
             <p id="dialogue-text">这是一段用于检查排版的示例文字。</p>
             <footer><kbd id="key-dialogue">Space</kbd><span>继续</span><i></i></footer>
         </div>
-        <button type="button" id="skip-dialogue" class="dialogue-skip" title="跳过本段对白，选项仍需亲自选择"><span>跳过</span><svg viewBox="0 0 24 18" aria-hidden="true"><path d="m2 2 9 7-9 7zm10 0 9 7-9 7z"/></svg><kbd>Enter</kbd></button>
+        <button type="button" id="skip-dialogue" class="dialogue-skip" title="跳过本段对白，选项仍需亲自选择">
+            <span>跳过</span>
+            <svg viewBox="0 0 24 18" aria-hidden="true">
+                <path d="m2 2 9 7-9 7zm10 0 9 7-9 7z"/>
+            </svg>
+            <kbd>Enter</kbd></button>
     </section>
 
     <section class="overlay ui-layer" id="journal" hidden role="dialog" aria-modal="true"
@@ -205,14 +221,22 @@
         </div>
     </section>
 
-    <section class="overlay ui-layer" id="save-game" hidden role="dialog" aria-modal="true" aria-labelledby="save-game-title">
+    <section class="overlay ui-layer" id="save-game" hidden role="dialog" aria-modal="true"
+             aria-labelledby="save-game-title">
         <div class="panel-large game-save-panel">
-            <header class="panel-heading"><div><small>本地记录</small><h1 id="save-game-title">保存进度</h1></div><button type="button" data-close="save-game">返回</button></header>
-            <p id="save-game-note"></p><div id="game-save-slots"></div><p id="save-game-status" role="status" aria-live="polite"></p>
+            <header class="panel-heading">
+                <div><small>本地记录</small>
+                    <h1 id="save-game-title">保存进度</h1></div>
+                <button type="button" data-close="save-game">返回</button>
+            </header>
+            <p id="save-game-note"></p>
+            <div id="game-save-slots"></div>
+            <p id="save-game-status" role="status" aria-live="polite"></p>
         </div>
     </section>
 
-    <section class="overlay settings-overlay ui-layer" id="settings" hidden role="dialog" aria-modal="true" aria-label="设置">
+    <section class="overlay settings-overlay ui-layer" id="settings" hidden role="dialog" aria-modal="true"
+             aria-label="设置">
         <iframe id="settings-frame" class="settings-frame" title="设置" tabindex="0"></iframe>
     </section>
 
@@ -259,7 +283,10 @@
             <header class="panel-heading">
                 <div><small><span class="dev-mark">DEV</span>操作记录</small>
                     <h1 id="minigame-title">小游戏</h1></div>
-                <div class="minigame-actions"><button type="button" id="retry-minigame"><kbd>R</kbd> 重新挑战</button><button type="button" data-close="minigame">退出</button></div>
+                <div class="minigame-actions">
+                    <button type="button" id="retry-minigame"><kbd>R</kbd> 重新挑战</button>
+                    <button type="button" data-close="minigame">退出</button>
+                </div>
             </header>
             <div class="minigame-stage" aria-label="小游戏内容区域"><p>正式玩法尚未接入</p></div>
         </div>

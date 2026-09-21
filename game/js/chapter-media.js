@@ -21,9 +21,11 @@
     const button = layer.querySelector(".media-hold");
     const progress = layer.querySelector(".media-progress");
     const caption = layer.querySelector(".media-caption");
+
     function volume(settings = MoonStorage.loadSettings()) {
         video.volume = Math.max(0, Math.min(1, settings.masterVolume * settings.sfxVolume));
     }
+
     function open(node, finish) {
         video.pause();
         video.currentTime = 0;
@@ -34,6 +36,7 @@
         caption.textContent = "";
         volume();
     }
+
     function start() {
         if (!active) return;
         const session = active;
@@ -43,6 +46,7 @@
             button.hidden = false;
         });
     }
+
     function finish() {
         if (!active) return false;
         const done = active.finish;
@@ -51,7 +55,12 @@
         done();
         return true;
     }
-    function abort() { active = null; video.pause(); }
+
+    function abort() {
+        active = null;
+        video.pause();
+    }
+
     function tick() {
         if (active && Number.isFinite(video.duration)) {
             progress.textContent = Math.floor(video.currentTime) + " / " + Math.ceil(video.duration) + " 秒";
@@ -59,14 +68,21 @@
             caption.textContent = captions[index] || "";
         }
     }
+
     video.addEventListener("play", () => {
-        if (!active) { video.pause(); return; }
+        if (!active) {
+            video.pause();
+            return;
+        }
         active.playing = true;
         button.hidden = true;
     });
     video.addEventListener("ended", finish);
     video.addEventListener("error", () => {
-        if (active) { progress.textContent = "视频加载失败，请重试。"; button.hidden = false; }
+        if (active) {
+            progress.textContent = "视频加载失败，请重试。";
+            button.hidden = false;
+        }
     });
     button.addEventListener("click", start);
     layer.querySelector(".media-skip").addEventListener("click", finish);
@@ -75,9 +91,13 @@
     new MutationObserver(() => {
         if (layer.hidden || layer.dataset.motion === "closing") video.pause();
     }).observe(layer, {attributes: true, attributeFilter: ["hidden", "data-motion"]});
-    document.addEventListener("visibilitychange", () => { if (document.hidden) video.pause(); });
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) video.pause();
+    });
     globalThis.MoonChapterMedia = Object.freeze({
         open, tick, skip: finish, abort,
-        get state() { return active ? {playing: !video.paused, time: video.currentTime, holding: false, hold: 0} : null; }
+        get state() {
+            return active ? {playing: !video.paused, time: video.currentTime, holding: false, hold: 0} : null;
+        }
     });
 })();

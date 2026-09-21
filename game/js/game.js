@@ -45,8 +45,18 @@ if (storyMode && !runtimeReturn && (params.get('new') === '1' || !MoonStorage.lo
     configVersion: MoonMapConfig.CONFIG_VERSION,
     checkpointId: 'prologue-start'
 };
-if (params.get('test') === '1') {try {overviewProgress=JSON.parse(sessionStorage.getItem('moon_test_state')||'null')||overviewProgress;} catch {}}
-if (params.get('flow') === '1') {try {overviewProgress=JSON.parse(sessionStorage.getItem('moon_flow_state')||'null')||overviewProgress;} catch {}}
+if (params.get('test') === '1') {
+    try {
+        overviewProgress = JSON.parse(sessionStorage.getItem('moon_test_state') || 'null') || overviewProgress;
+    } catch {
+    }
+}
+if (params.get('flow') === '1') {
+    try {
+        overviewProgress = JSON.parse(sessionStorage.getItem('moon_flow_state') || 'null') || overviewProgress;
+    } catch {
+    }
+}
 const recoveryMap = overviewProgress.currentMap;
 const story = new MoonStory({state: overviewProgress, tasks: [...MoonH01.tasks, ...MoonDay3.tasks]});
 const h01 = new MoonH01.Controller(story);
@@ -57,6 +67,7 @@ const puzzles = new MoonPuzzles($('.minigame-stage'), (node, result) => {
 });
 let awakening = storyMode && story.state.node === 'P00', awakeningTime = -1, awakeningLock = 0;
 let lastStoryNode = story.state.node;
+let lastChapter = Number(story.state.chapter) || 0;
 let echoTime = 0;
 let initialized = false;
 let nearestInteraction = null;
@@ -119,6 +130,7 @@ let leavingGame = false;
 let mapUnavailableTimer = 0;
 let nearestDoor = null;
 let lastTime = performance.now();
+
 function firstStoryLine(definition) {
     for (const item of definition?.queue || []) {
         if (item?.type === "line" && typeof item.text === "string") {
@@ -240,40 +252,65 @@ function updateHud() {
     $("#door-shape-toggle").setAttribute("aria-pressed", String(showDoorInteractions));
     $("#door-shape-toggle").textContent = showDoorInteractions ? "隐藏门范围" : "显示门范围";
     updateOverview();
+    updateMentalHud();
+}
+
+function updateMentalHud() {
+    const hud = $('#mental-hud');
+    if (!hud) return;
+    if (!storyMode) {
+        hud.hidden = true;
+        return;
+    }
+    const value = Math.max(0, Math.min(100, Math.round(Number(story.state.mental_value) || 0)));
+    hud.hidden = false;
+    const valueEl = $('#mental-value');
+    if (valueEl) valueEl.textContent = String(value);
+    const bar = $('#mental-bar');
+    if (bar) bar.style.width = value + '%';
+    hud.dataset.level = value <= 20 ? 'critical' : value <= 50 ? 'low' : 'normal';
 }
 
 function updateStoryHud() {
     $('.evidence-cards')?.remove();
-    const journalList=$('.journal-entry ul');if(journalList)journalList.hidden=false;
+    const journalList = $('.journal-entry ul');
+    if (journalList) journalList.hidden = false;
     updateStoryHudBase();
-    if (storyMode) {if(journalEvidence)MoonEvidence.render($('.journal-entry'),story.state);else updateInvestigationJournal();}
+    if (storyMode) {
+        if (journalEvidence) MoonEvidence.render($('.journal-entry'), story.state); else updateInvestigationJournal();
+    }
 }
 
 function updateStoryHudBase() {
+    updateMentalHud();
     if (!storyMode) return;
     const s = story.state, n = MoonH01.count(s), complete = s.flags.h01_complete;
     $('#chapter-day').textContent = `第一章 · 第 ${s.day} 天`;
     const remaining = s.day === 1 ? 365 : 365 - s.day;
     if (campaign.node || s.chapterComplete) {
-        $('#chapter-day').textContent = `${s.flags.archive_mode ? '档案重建 · 只读' : s.chapter === 0 ? '序章' : (MoonLater.chapters[s.chapter]?.title || '第一章')} · 第 ${s.day} 天 · ${s.flags.player_name||(s.flags.independent17?"WUKANG-17":"WUKANG")} ${s.flags.plan_terminated?'':('· 剩余 '+remaining+' 天')}`;
-        const def = campaign.node, targets = def?.targets || [], list = $('#task-list');
+        $('#chapter-day').textContent = `${s.flags.archive_mode ? '档案重建 · 只读' : s.chapter === 0 ? '序章' : (MoonLater.chapters[s.chapter]?.title || '第一章')} · 第 ${s.day} 天 · ${s.flags.player_name || (s.flags.independent17 ? "WUKANG-17" : "WUKANG")} ${s.flags.plan_terminated ? '' : ('· 剩余 ' + remaining + ' 天')}`;
+        const def = campaign.node, allTargets = def?.targets || [];
+
+        const targets = allTargets.filter(o => o.map === mapId), list = $('#task-list');
         list.replaceChildren();
-        $('#task-count').textContent = s.chapterComplete ? '完成' : `${targets.length ? 0 : 1}/1`;
-        for (const text of s.chapterComplete ? [(MoonLater.chapters[s.chapter]?.title||'第一章')+' · 已完成'] : targets.length ? targets.map(o => o.label) : [def.title]) {
+
+        $('#task-count').textContent = s.chapterComplete ? '完成' : `${(s.completedTasks || []).includes(def.id) ? 1 : 0}/1`;
+        const elsewhere = !targets.length && allTargets.length ? '（任务位于 ' + (window.MoonMapConfig.MAPS[allTargets[0].map]?.name || '其他区域') + '）' : '';
+        for (const text of s.chapterComplete ? [(MoonLater.chapters[s.chapter]?.title || '第一章') + ' · 已完成'] : targets.length ? targets.map(o => o.label) : allTargets.length ? [def.title + elsewhere] : [def.title]) {
             const li = document.createElement('li');
             li.textContent = text;
             list.append(li);
         }
         const entry = $('.journal-entry');
-        entry.querySelector('h2').textContent = journalEvidence ? '证据档案' : def?.title || (MoonLater.chapters[s.chapter]?.title+' · 完成');
+        entry.querySelector('h2').textContent = journalEvidence ? '证据档案' : def?.title || (MoonLater.chapters[s.chapter]?.title + ' · 完成');
         entry.querySelector('b').textContent = journalEvidence ? String(s.evidence.length) : `精神 ${s.mental_value}`;
-        entry.querySelector('p').textContent = journalEvidence ? '这里只记录已经亲自核验的物证。' : s.chapterComplete ? (MoonLater.chapters[s.chapter]?.summary||'本章完成。') : targets[0]?.label || '正在交谈';
+        entry.querySelector('p').textContent = journalEvidence ? '这里只记录已经亲自核验的物证。' : s.chapterComplete ? (MoonLater.chapters[s.chapter]?.summary || '本章完成。') : allTargets[0]?.label || '正在交谈';
         const ul = entry.querySelector('ul');
         ul.replaceChildren();
         for (const text of journalEvidence ? s.evidence.map(id => ({
             E01: 'E01 · 十六组轨迹摘要：样本时序不同，身份尚未确认。',
             E02: 'E02 · AZHI与XING-8条目：本地运行，源资料截止于离开地球前。'
-        }[id] || id)) : targets.map(o => `${o.map} · ${o.label}`)) {
+        }[id] || id)) : allTargets.map(o => `${o.map} · ${o.label}`)) {
             const li = document.createElement('li');
             li.textContent = text;
             ul.append(li);
@@ -426,40 +463,96 @@ function nearestWalkable(point) {
             if (playerCanWalk(mapId, x, y, foot.radiusX, foot.radiusY)) return {x, y};
         }
     }
- return {x: 836, y: 600};
+    return {x: 836, y: 600};
 }
 
-const familyDoorPairs=new Set([
- "F00:F01","F01:F00",
- "F01:F02","F02:F01",
- "F01:F03","F03:F01",
- "F01:F04","F04:F01"
+const familyDoorPairs = new Set([
+    "F00:F01", "F01:F00",
+    "F01:F02", "F02:F01",
+    "F01:F03", "F03:F01",
+    "F01:F04", "F04:F01"
 ]);
 
-function playFamilyDoorSfx(from,to){
- if(familyDoorPairs.has(`${from}:${to}`))MoonSound.playDoorSfx();
+function playFamilyDoorSfx(from, to) {
+    if (familyDoorPairs.has(`${from}:${to}`)) MoonSound.playDoorSfx();
 }
 
-const baseDoorMaps=new Set([
- "R01","R02","R03","R04","R05","R06","R07","R08",
- "B01","B02","B03","B04","B05",
- "A02","A03","A04","A05","A06","A07"
+const baseDoorMaps = new Set([
+    "R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08",
+    "B01", "B02", "B03", "B04", "B05",
+    "A02", "A03", "A04", "A05", "A06", "A07"
 ]);
 
-const cloneRevealNodes=new Set([
- "M02_LIGHT16","M02_CURRENT","M02_GROWTH","M02_PREV16","M02_PREVALL","M02_ORIGINAL"
+const cloneRevealNodes = new Set([
+    "M02_LIGHT16", "M02_CURRENT", "M02_GROWTH", "M02_PREV16", "M02_PREVALL", "M02_ORIGINAL"
 ]);
 
-function playDoorTransitionSfx(from,to){
- if((from==='F01'&&to==='F05')||(from==='F05'&&to==='F01')){
-  MoonSound.playBalconyDoorSfx();
-  return;
- }
- if(familyDoorPairs.has(`${from}:${to}`))MoonSound.playDoorSfx();
- if(baseDoorMaps.has(from)&&baseDoorMaps.has(to))MoonSound.playBaseDoorSfx();
+function playDoorTransitionSfx(from, to) {
+    if ((from === 'F01' && to === 'F05') || (from === 'F05' && to === 'F01')) {
+        MoonSound.playBalconyDoorSfx();
+        return;
+    }
+    if (familyDoorPairs.has(`${from}:${to}`)) MoonSound.playDoorSfx();
+    if (baseDoorMaps.has(from) && baseDoorMaps.has(to)) MoonSound.playBaseDoorSfx();
+}
+
+const CORE_FEAR_KEY = 'moon_without_return_core_fear_v1';
+let coreFearSeen = false;
+
+function coreFearStore(on) {
+    try {
+        on ? sessionStorage.setItem(CORE_FEAR_KEY, '1') : sessionStorage.removeItem(CORE_FEAR_KEY);
+    } catch (error) {
+    }
+}
+
+function coreFearRemembered() {
+    try {
+        return sessionStorage.getItem(CORE_FEAR_KEY) === '1';
+    } catch (error) {
+        return false;
+    }
+}
+
+function chapterTrack() {
+    const state = story.state;
+    const chapter = Number(state.chapter) || 0;
+    const inBase = mapId.startsWith('R') || mapId.startsWith('B');
+    const flags = state.flags || {};
+
+
+    if (chapter > 4) {
+        if (coreFearSeen || coreFearRemembered()) {
+            coreFearSeen = false;
+            coreFearStore(false);
+        }
+    } else if (!coreFearSeen && (mapId === 'B04' || Number(flags.core_rule_count) >= 1 || (flags.core_access && coreFearRemembered()))) {
+        coreFearSeen = true;
+        coreFearStore(true);
+    }
+    if (chapter <= 4 && coreFearSeen) return 'fear';
+
+
+    if (chapter <= 2 && flags.home_bgm === 'little-goth' && mapId.startsWith('F')) return 'littleGoth';
+
+
+    if (flags.ending_bgm === 'to-the-moon') return 'toTheMoon';
+
+    if (chapter === 6 && mapId.startsWith('F')) return 'everything';
+
+    if (chapter >= 7 && inBase) return 'checking';
+
+    if (chapter >= 5 && inBase) return 'rhapsody';
+    return '';
 }
 
 function syncSceneMusic() {
+    const track = chapterTrack();
+    if (track) {
+        MoonSound.playChapterMusic(track);
+        return;
+    }
+    MoonSound.stopChapterMusic();
     if (mapId === 'B02' && cloneRevealNodes.has(story.state.node)) {
         MoonSound.stopHomeVoice();
         MoonSound.stopBaseMusic();
@@ -482,7 +575,7 @@ function syncSceneMusic() {
 
     const echoScene = story.state.chapter === 1 && (
         (node === 'H04_PASS2' && story.busy) ||
-        ['H04_FOLLOW', 'H04_LIFT', 'H04_CACHE', 'H04_MEDIUM', 'V_CACHE_CLEAR', 'V_CACHE_HASH'].includes(node)
+        ['H04_FOLLOW', 'H04_LIFT', 'H04_CACHE', 'H04_MEDIUM', 'V_CACHE_CLEAR', 'V_CACHE_HASH', 'H04_COLD', 'H05_REHAB'].includes(node)
     );
     if (echoScene) {
         MoonSound.stopHomeVoice();
@@ -503,10 +596,11 @@ function enterMap(nextId, spawn = null, fromSelector = false) {
     velocity = {x: 0, y: 0};
     moving = false;
     animationTime = 0;
-    if(!MoonHistory.testing)localStorage.setItem("moon_without_return_map_test_v1", mapId);
+    if (!MoonHistory.testing) localStorage.setItem("moon_without_return_map_test_v1", mapId);
     syncSceneMusic();
     loadMapImage();
     updateHud();
+    if (storyMode) updateStoryHud();
     input.clear();
     clearCoordinateSelection();
     if (storyMode && initialized && !story.busy) story.save();
@@ -571,7 +665,9 @@ function updateMovement(dt) {
         dy /= length;
         setFacing(dx, dy);
     }
-    const speed = 235, rate = hasInput ? 1500 : 1900;
+    const slowWalkMaps = new Set(["F01", "R02", "A02", "B01"]);
+    const slowZone = slowWalkMaps.has(mapId);
+    const speed = slowZone ? 235 : 300, rate = hasInput ? (slowZone ? 1500 : 1900) : (slowZone ? 1900 : 2300);
     const approach = (value, target, amount) => value < target ? Math.min(value + amount, target) : Math.max(value - amount, target);
     velocity.x = approach(velocity.x, dx * speed, rate * dt);
     velocity.y = approach(velocity.y, dy * speed, rate * dt);
@@ -802,8 +898,12 @@ function renderFamilyActor(actor) {
 }
 
 function render() {
-    document.body.dataset.moonWalk=String(storyMode&&mapId==='R09'&&story.state.flags.outside_ready);
-    if(storyMode&&mapId==='R09'&&story.state.flags.outside_ready){const s=story.state,text=MoonFinal.name(s)+' · 氧量 '+s.flags.oxygen+'% · 信标 '+(Math.round(Math.hypot(position.x-1200,position.y-650)/10)*10)+' m';if($('#chapter-day').textContent!==text)$('#chapter-day').textContent=text;}
+    document.body.dataset.moonWalk = String(storyMode && mapId === 'R09' && story.state.flags.outside_ready);
+    if (storyMode && mapId === 'R09' && story.state.flags.outside_ready) {
+        const s = story.state,
+            text = MoonFinal.name(s) + ' · 氧量 ' + s.flags.oxygen + '% · 信标 ' + (Math.round(Math.hypot(position.x - 1200, position.y - 650) / 10) * 10) + ' m';
+        if ($('#chapter-day').textContent !== text) $('#chapter-day').textContent = text;
+    }
     const pixelRatio = devicePixelRatio || 1, targetW = Math.round(canvas.clientWidth * pixelRatio),
         targetH = Math.round(canvas.clientHeight * pixelRatio);
     if (canvas.width !== targetW || canvas.height !== targetH) {
@@ -820,7 +920,7 @@ function render() {
     ctx.translate(offsetX, offsetY);
     ctx.scale(scale, scale);
     if (mapReady) ctx.drawImage(mapImage, 0, 0, MAP_SIZE.width, MAP_SIZE.height);
-    if (storyMode && ['S1','S2','S3'].includes(story.state.family_state) && mapId === 'F01' && Math.floor(performance.now() / 1500) % 6 === 0) {
+    if (storyMode && ['S1', 'S2', 'S3'].includes(story.state.family_state) && mapId === 'F01' && Math.floor(performance.now() / 1500) % 6 === 0) {
         const glitch = familyGlitchImages.stage1;
         if (glitch.complete && glitch.naturalWidth) ctx.drawImage(glitch, 0, 0, MAP_SIZE.width, MAP_SIZE.height);
     }
@@ -832,14 +932,25 @@ function render() {
         ctx.drawImage(walkSheet, frame * 256, direction.row * 256, 256, 256, 965 - echoTime * 35 - size.width / 2, 510 - size.height * 244 / 256, size.width, size.height);
         ctx.restore();
     }
-    if(storyMode){renderChapterEnvironment();MoonFinalScene.draw(ctx,story.state,mapId,position);}
+    if (storyMode) {
+        renderChapterEnvironment();
+        MoonFinalScene.draw(ctx, story.state, mapId, position);
+    }
     renderTaskObjects();
     if (showCollision) renderCollision();
     if (showDoorInteractions) renderDoorInteractions();
-    const actors = familyPatrol.visible(mapId).map(actor => ({y: actor.y, draw: () => renderFamilyActor(actor)}));
-    actors.push({y: position.y, draw: renderPlayer});
+
+    const epilogueScene = storyMode && (story.state.flags.epilogue || story.state.node === "F_EARTH");
+    const actors = epilogueScene ? [] : familyPatrol.visible(mapId).map(actor => ({
+        y: actor.y,
+        draw: () => renderFamilyActor(actor)
+    }));
+    if (!epilogueScene) actors.push({y: position.y, draw: renderPlayer});
     actors.sort((a, b) => a.y - b.y).forEach(a => a.draw());
-    if(storyMode&&story.state.flags.epilogue_black){ctx.fillStyle="#000";ctx.fillRect(0,0,1672,941);}
+    if (storyMode && story.state.flags.epilogue_black) {
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, 1672, 941);
+    }
     ctx.restore();
 }
 
@@ -851,13 +962,14 @@ function openOverlay(id) {
     const layer = $("#" + id);
     if (!layer) return false;
     if (leavingGame) return false;
-    if(id==='pause'){
-        if(!['pause','save-game','leave-confirm'].includes(activeOverlay))pausedFrom=activeOverlay;
-        if(pausedFrom==='minigame')puzzles.leaveFullscreen();if(pausedFrom==='final-form')MoonFinalForms.release();
-        $('#pause-save').disabled=!storyMode;
-        if(storyMode&&!story.busy)story.save();
+    if (id === 'pause') {
+        if (!['pause', 'save-game', 'leave-confirm'].includes(activeOverlay)) pausedFrom = activeOverlay;
+        if (pausedFrom === 'minigame') puzzles.leaveFullscreen();
+        if (pausedFrom === 'final-form') MoonFinalForms.release();
+        $('#pause-save').disabled = !storyMode;
+        if (storyMode && !story.busy) story.save();
     }
-    if(id==='save-game')renderGameSaves();
+    if (id === 'save-game') renderGameSaves();
     if (!activeOverlay) overlayReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     if (activeOverlay && activeOverlay !== id) MoonUiMotion.hide($("#" + activeOverlay));
     const revision = ++overlayRevision;
@@ -878,10 +990,19 @@ function openOverlay(id) {
 }
 
 function closeOverlay(id, restoreFocus = true) {
-    if(id==='save-game'||(id==='leave-confirm'&&pausedFrom)){openOverlay('pause');return Promise.resolve(true);}
-    if(id==='pause'&&pausedFrom){const target=pausedFrom;pausedFrom=null;openOverlay(target);if(target==='minigame'&&puzzles.started)restorePuzzleFullscreen();return Promise.resolve(true);}
-    if(id==='final-form')MoonFinalForms.abort();
-    if(id==='chapter-media')MoonChapterMedia.abort();
+    if (id === 'save-game' || (id === 'leave-confirm' && pausedFrom)) {
+        openOverlay('pause');
+        return Promise.resolve(true);
+    }
+    if (id === 'pause' && pausedFrom) {
+        const target = pausedFrom;
+        pausedFrom = null;
+        openOverlay(target);
+        if (target === 'minigame' && puzzles.started) restorePuzzleFullscreen();
+        return Promise.resolve(true);
+    }
+    if (id === 'final-form') MoonFinalForms.abort();
+    if (id === 'chapter-media') MoonChapterMedia.abort();
     if (story.busy && (id === "dialogue" || id === "choice")) return Promise.resolve(false);
     if (id === 'minigame') {
         if (puzzles.running && puzzles.result) return Promise.resolve(puzzles.confirm());
@@ -900,7 +1021,13 @@ function closeOverlay(id, restoreFocus = true) {
         statusHuds?.obscure(false);
         input.clear();
         if (restoreFocus && overlayReturnFocus?.isConnected) overlayReturnFocus.focus({preventScroll: true});
-        if(id==='ending'&&storyMode){if(story.state.flags.game_complete){location.assign('../main/index.html');return true;}MoonLater.startNext(story);}
+        if (id === 'ending' && storyMode) {
+            if (story.state.flags.game_complete) {
+                location.assign('../main/index.html');
+                return true;
+            }
+            MoonLater.startNext(story);
+        }
         return true;
     });
 }
@@ -926,7 +1053,7 @@ function openMap() {
         }, 1800);
         return false;
     }
-    if(story.state.flags.epilogue)return false;
+    if (story.state.flags.epilogue) return false;
     updateOverview();
     return openOverlay("overview");
 }
@@ -1063,7 +1190,7 @@ function update(now) {
         dialogueReveal.tick(dt);
         $('#dialogue footer span').textContent = dialogueReveal.complete ? '继续' : '显示全文';
     }
-    if (!document.hidden && (!activeOverlay || ['dialogue','choice'].includes(activeOverlay))) story.tick(dt);
+    if (!document.hidden && (!activeOverlay || ['dialogue', 'choice'].includes(activeOverlay))) story.tick(dt);
     if (storyMode && mapReady && !activeOverlay && !story.busy && story.state.node === 'H01' && !story.state.flags.h01_started) h01.start();
     if (storyMode && mapReady && !activeOverlay && !story.busy) {
         if (campaign.node) campaign.automatic(); else day3.automatic();
@@ -1102,7 +1229,17 @@ function update(now) {
                     id: 'wrist_door_reminder',
                     once: false,
                     queue: [{type: 'line', actor: 'guanghan', text: '先拿起舱旁的腕端终端，完成体征确认后才能离开。'}]
-                }); else {const reason=storyMode?MoonLater.door(story.state,mapId,nearestDoor.to):'';if(reason)story.run({id:'door_access_notice',once:false,queue:[{type:'line',actor:'guanghan',text:reason}]});else{playDoorTransitionSfx(mapId,nearestDoor.to);enterMap(nearestDoor.to);}}
+                }); else {
+                    const reason = storyMode ? MoonLater.door(story.state, mapId, nearestDoor.to) : '';
+                    if (reason) story.run({
+                        id: 'door_access_notice',
+                        once: false,
+                        queue: [{type: 'line', actor: 'guanghan', text: reason}]
+                    }); else {
+                        playDoorTransitionSfx(mapId, nearestDoor.to);
+                        enterMap(nearestDoor.to);
+                    }
+                }
             }
         }
         if (story.busy) {
@@ -1124,14 +1261,32 @@ function update(now) {
         else if (activeOverlay === "dialogue" && input.justPressed.has("Space")) {
             input.justPressed.delete("Space");
             advanceDialogue();
-        } else if (input.consume("pause")) {if(["dialogue","choice","minigame","chapter-media","final-form"].includes(activeOverlay))openOverlay("pause");else closeOverlay(activeOverlay);}
+        } else if (input.consume("pause")) {
+            if (["dialogue", "choice", "minigame", "chapter-media", "final-form"].includes(activeOverlay)) openOverlay("pause"); else closeOverlay(activeOverlay);
+        }
     }
     render();
     input.endFrame();
     requestAnimationFrame(update);
 }
 
-function showChapterEnd(){const state=story.state,entry=globalThis.MoonEndings?.entries[state.flags.ending],chapter=entry?{title:entry.title,summary:entry.intro}:MoonLater.chapters[state.chapter]||MoonLater.chapters[1];$('#ending-title').textContent=chapter.title;$('#ending .ending-panel small').textContent=entry?'结局已记录':'章节完成';$('#ending .ending-panel p').textContent=chapter.summary+' 已保存 '+MoonEvidence.collected(state).length+' 项重要记录。';$('#ending [data-close]').textContent=state.flags.game_complete?'返回主菜单':chapter.next?'继续第'+(state.chapter+1)+'章':'返回基地';openOverlay('ending');if(entry)window.dispatchEvent(new CustomEvent('moon:ending-visible',{detail:state}));}
+function showChapterEnd() {
+    const state = story.state, entry = globalThis.MoonEndings?.entries[state.flags.ending], chapter = entry ? {
+        title: entry.title,
+        summary: entry.intro
+    } : MoonLater.chapters[state.chapter] || MoonLater.chapters[1];
+    $('#ending-title').textContent = chapter.title;
+    $('#ending .ending-panel small').textContent = entry ? '结局已记录' : '章节完成';
+    $('#ending .ending-panel p').textContent = chapter.summary + ' 已保存 ' + MoonEvidence.collected(state).length + ' 项重要记录。';
+    $('#ending [data-close]').textContent = state.flags.game_complete ? '返回主菜单' : chapter.next ? '继续第' + (state.chapter + 1) + '章' : '返回基地';
+    openOverlay('ending');
+    const endingPanel = document.querySelector('#ending .ending-panel');
+    if (entry) {
+        endingPanel?.classList.remove('is-revealed');
+        endingPanel?.classList.add('is-pre-reveal');
+        window.dispatchEvent(new CustomEvent('moon:ending-visible', {detail: state}));
+    }
+}
 
 function advanceDialogue() {
     if (activeOverlay !== 'dialogue') return;
@@ -1142,7 +1297,8 @@ function advanceDialogue() {
 
 function bindUi() {
     window.addEventListener('keyup', e => {
-        if (e.code === 'Space') puzzles.pouring = false;MoonActivities.newRelease?.(puzzles,e.code==='KeyW'&&puzzles.classic?.kind==='jump'?'Space':e.code);
+        if (e.code === 'Space') puzzles.pouring = false;
+        MoonActivities.newRelease?.(puzzles, e.code === 'KeyW' && puzzles.classic?.kind === 'jump' ? 'Space' : e.code);
     });
     window.addEventListener('blur', () => puzzles.pouring = false);
     const resumeAudio = () => {
@@ -1163,19 +1319,44 @@ function bindUi() {
         puzzles.open(event.detail);
         openOverlay('minigame');
     });
-    window.addEventListener('moon:chapter-media',event=>{const def=MoonCampaign.nodes[event.detail.node];if(story.state.node!==def.id)return;MoonChapterMedia.open(def.id,()=>closeOverlay('chapter-media').then(()=>{if(story.state.node===def.id)campaign.commit(def);}));openOverlay('chapter-media');});
-    window.addEventListener('moon:final-form',event=>{const def=MoonCampaign.nodes[event.detail.node];MoonFinalForms.open(def,story.state,flags=>{closeOverlay('final-form').then(()=>{if(story.state.node===def.id)campaign.commit({...def,effects:{...def.effects,flags:{...def.effects?.flags,...flags}}});});});openOverlay('final-form');});
+    window.addEventListener('moon:chapter-media', event => {
+        const def = MoonCampaign.nodes[event.detail.node];
+        if (story.state.node !== def.id) return;
+        MoonChapterMedia.open(def.id, () => closeOverlay('chapter-media').then(() => {
+            if (story.state.node === def.id) campaign.commit(def);
+        }));
+        openOverlay('chapter-media');
+    });
+    window.addEventListener('moon:final-form', event => {
+        const def = MoonCampaign.nodes[event.detail.node];
+        MoonFinalForms.open(def, story.state, flags => {
+            closeOverlay('final-form').then(() => {
+                if (story.state.node === def.id) campaign.commit({
+                    ...def,
+                    effects: {...def.effects, flags: {...def.effects?.flags, ...flags}}
+                });
+            });
+        });
+        openOverlay('final-form');
+    });
     $('#dialogue .dialogue-box').addEventListener('click', advanceDialogue);
-    $('#skip-dialogue').addEventListener('click',()=>{if(activeOverlay==='dialogue'){dialogueReveal.finish();if(!story.skipSegment())closeOverlay('dialogue');}});
-    $('#pause-save').addEventListener('click',()=>openOverlay('save-game'));
-    $('#retry-minigame').addEventListener('click',()=>{if(activeOverlay==='minigame'&&puzzles.retry())restorePuzzleFullscreen();});
+    $('#skip-dialogue').addEventListener('click', () => {
+        if (activeOverlay === 'dialogue') {
+            dialogueReveal.finish();
+            if (!story.skipSegment()) closeOverlay('dialogue');
+        }
+    });
+    $('#pause-save').addEventListener('click', () => openOverlay('save-game'));
+    $('#retry-minigame').addEventListener('click', () => {
+        if (activeOverlay === 'minigame' && puzzles.retry()) restorePuzzleFullscreen();
+    });
     $('.terminal-body .primary-action').addEventListener('click', () => {
         if (storyMode && activeOverlay === 'terminal' && nearestInteraction?.kind === 'temperature' && !story.busy) day3.resetTemperature();
     });
     window.addEventListener("moon:story-presentation", event => {
         syncSceneMusic();
         const item = event.detail;
-        $('#dialogue').dataset.wait=String(item?.type==='wait');
+        $('#dialogue').dataset.wait = String(item?.type === 'wait');
 
         if (item?.type !== 'line') $('#dialogue-portrait').hidden = true;
         $('#story-detail').hidden = !item?.illustration;
@@ -1215,7 +1396,7 @@ function bindUi() {
         } else {
             if (item.type === "line") {
                 const actor = MoonCampaign.actors[item.actor] || MoonChapter1.actors[item.actor] || MoonChapter1.actors.system;
-                $("#dialogue-speaker").textContent = item.actor==='wukang'&&story.state.flags.player_name?story.state.flags.player_name:actor.name;
+                $("#dialogue-speaker").textContent = item.actor === 'wukang' && story.state.flags.player_name ? story.state.flags.player_name : actor.name;
                 $("#dialogue-role").textContent = actor.role;
                 const labels = {
                     move: ['moveUp', 'moveLeft', 'moveDown', 'moveRight'].map(a => MoonStorage.keyLabel(input.code(a))).join('/'),
@@ -1273,17 +1454,26 @@ function bindUi() {
         updateStoryHud();
     }));
     document.addEventListener("keydown", event => {
-        if(event.code==='Enter'&&['dialogue','chapter-media'].includes(activeOverlay)&&!input.isEditable(event.target)){
-            event.preventDefault();event.stopPropagation();input.clear();if(!event.repeat){if(activeOverlay==='dialogue')$('#skip-dialogue').click();else MoonChapterMedia.skip();}return;
+        if (event.code === 'Enter' && ['dialogue', 'chapter-media'].includes(activeOverlay) && !input.isEditable(event.target)) {
+            event.preventDefault();
+            event.stopPropagation();
+            input.clear();
+            if (!event.repeat) {
+                if (activeOverlay === 'dialogue') $('#skip-dialogue').click(); else MoonChapterMedia.skip();
+            }
+            return;
         }
-        if(event.code==='KeyR'&&activeOverlay==='minigame'&&!input.isEditable(event.target)){
-            event.preventDefault();event.stopPropagation();input.clear();
-            if(!event.repeat&&puzzles.retry())restorePuzzleFullscreen();return;
+        if (event.code === 'KeyR' && activeOverlay === 'minigame' && !input.isEditable(event.target)) {
+            event.preventDefault();
+            event.stopPropagation();
+            input.clear();
+            if (!event.repeat && puzzles.retry()) restorePuzzleFullscreen();
+            return;
         }
         if (activeOverlay === 'minigame' && !input.isEditable(event.target)) {
-            if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyA','KeyS','KeyD','Space'].includes(event.code))event.preventDefault();
-            if ((['sokoban','merge'].includes(puzzles.classic?.kind)&&event.code.startsWith('Arrow'))||(['flier','runner'].includes(puzzles.classic?.kind)&&['Space','ArrowUp'].includes(event.code))) event.preventDefault();
-            if(!event.repeat)puzzles.key(event.code);
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space'].includes(event.code)) event.preventDefault();
+            if ((['sokoban', 'merge'].includes(puzzles.classic?.kind) && event.code.startsWith('Arrow')) || (['flier', 'runner'].includes(puzzles.classic?.kind) && ['Space', 'ArrowUp'].includes(event.code))) event.preventDefault();
+            if (!event.repeat) puzzles.key(event.code);
         }
         if (activeOverlay === "overview" && event.code === input.code("map")) {
             event.preventDefault();
@@ -1317,7 +1507,6 @@ function bindUi() {
     window.addEventListener("moon:settings-changed", updateHud);
     window.addEventListener("message", event => {
         if (!event.data) return;
-
 
 
         if (event.data.type === "moon-settings-close") {
@@ -1354,6 +1543,13 @@ function bindUi() {
                 enterMap(target.map, {x: target.x, y: target.y}, true);
                 if (target.map === 'F01') facingRow = 4;
             }
+        }
+
+
+        const chapter = Number(state.chapter) || 0;
+        if (chapter !== lastChapter) {
+            lastChapter = chapter;
+            syncSceneMusic();
         }
         overviewProgress = state;
         updateOverview();
@@ -1409,7 +1605,7 @@ function initialize() {
         history.replaceState(null, '', resumeUrl);
     }
     initialized = true;
-    if(storyMode&&story.state.chapterComplete)requestAnimationFrame(showChapterEnd);
+    if (storyMode && story.state.chapterComplete) requestAnimationFrame(showChapterEnd);
     if (awakening) {
         $('#wake-screen').hidden = false;
         statusHuds.obscure(true);
@@ -1444,7 +1640,7 @@ function initialize() {
             return isWalkable(id, x, y, foot.radiusX, foot.radiusY);
         }, maps: MAPS
     };
-window.MoonUiDebug = {
+    window.MoonUiDebug = {
         open: openOverlay, close: closeOverlay, openMap, get active() {
             return activeOverlay;
         }, states: ["journal", "overview", "pause", "choice", "dialogue", "terminal", "minigame", "ending"]
@@ -1462,43 +1658,116 @@ window.MoonUiDebug = {
 }
 
 initialize();
-function renderChapterEnvironment(){
- const s=story.state;
- if(mapId==='B02'&&s.chapter>=2){ctx.save();if(!s.flags.culture_power){ctx.fillStyle='#000b';ctx.fillRect(0,0,1672,941);}const count=s.flags.pods_lit||0;ctx.font='bold 22px monospace';ctx.textAlign='center';[1180,1000,820,650,465].forEach((x,i)=>{ctx.fillStyle=i<count?'#ddc886':'#202b2c';ctx.fillRect(x-40,372,80,30);if(i<count){ctx.fillStyle='#192629';ctx.fillText(String(17-i),x,395);}});ctx.restore();}
- if(mapId==='F01'&&['S2','S3'].includes(s.family_state)){ctx.save();const glitch=familyGlitchImages.stage2;if(glitch.complete&&glitch.naturalWidth)ctx.drawImage(glitch,0,0,MAP_SIZE.width,MAP_SIZE.height);ctx.restore();}
- if(mapId==='R06'&&s.flags.reply_queued){ctx.save();ctx.fillStyle='#d6b557';ctx.beginPath();ctx.arc(910,340,9,0,Math.PI*2);ctx.fill();ctx.font='18px sans-serif';ctx.fillText('地球待确认',930,348);ctx.restore();}
- if(mapId==='R05'&&s.node==='M03_SEE'&&walkSheet){const size=getCharacterDrawSize(mapId);ctx.save();ctx.globalAlpha=.28;ctx.drawImage(walkSheet,0,4*256,256,256,1000-size.width/2,490-size.height*244/256,size.width,size.height);ctx.restore();}
-}
-function restorePuzzleFullscreen(){
-    const screen=$('#minigame');
-    if(!document.fullscreenElement&&screen.requestFullscreen)screen.requestFullscreen().then(()=>{puzzles.ownsFullscreen=true;if(activeOverlay!=='minigame')puzzles.leaveFullscreen();}).catch(()=>{});
-}
-function renderGameSaves(){
-    overwriteSlot=null;
-    $('#save-game-status').textContent='';
-    $('#save-game-note').textContent=story.busy?'本段对话尚未结束。保存已确认的进度，读档后从本段开始。':puzzles.running?'保存当前任务与证据；读档后，本次小游戏从头开始。':'保存当前所在位置、任务、证据与选择，并保留保存前的最后一刻画面与对应情节。';
-    const root=$('#game-save-slots');root.replaceChildren();
-    MoonStorage.listSlots().forEach(({id,data})=>{
-        const card=document.createElement('article');
-        card.className='game-save-slot'+(data?'':' is-empty');
-        const figure=MoonSaveThumbnail.create(data,'game-save-slot__thumb',{placeholder:'NO FRAME',label:'存档 '+id+' 的最后一刻画面'});
-        const body=document.createElement('div');body.className='game-save-slot__body';
-        const heading=document.createElement('div');heading.className='game-save-slot__heading';
-        const label=document.createElement('strong');label.textContent='存档 '+String(id).padStart(2,'0');
-        const chapter=document.createElement('small');chapter.textContent=data?(data.chapterTitle||('第 '+(data.chapter||0)+' 章')):'EMPTY';
-        heading.append(label,chapter);
-        const plot=document.createElement('b');plot.className='game-save-slot__plot';plot.textContent=data?(data.storyTitle||'未记录情节'):'未检测到任务记录';
-        const summary=document.createElement('p');summary.className='game-save-slot__summary';summary.textContent=data?(data.storySummary||'任务正在进行，已保存当前探索位置与状态。'):'空白档案槽位。';
-        const detail=document.createElement('p');detail.className='game-save-slot__meta';
-        detail.textContent=data?(data.flags.player_name?data.flags.player_name+' · ':'')+'第 '+data.chapter+' 章 · 第 '+data.day+' 天 · '+data.currentMap+' · '+new Date(data.savedAt).toLocaleString('zh-CN',{hour12:false}):'EMPTY SLOT';
-        body.append(heading,plot,summary,detail);
-        const button=document.createElement('button');
-        button.type='button';button.dataset.slot=id;button.textContent=data?'覆盖此存档':'存入此处';button.setAttribute('aria-label','保存到存档 '+id);
-        button.addEventListener('click',()=>{
-            if(MoonStorage.loadGame(id)&&overwriteSlot!==id){overwriteSlot=id;root.querySelectorAll('button').forEach(b=>b.textContent=MoonStorage.loadGame(Number(b.dataset.slot))?'覆盖此存档':'存入此处');button.textContent='确认覆盖';$('#save-game-status').textContent='再次点击确认覆盖存档 '+id+'。';return;}
-            if(!story.busy)story.setLocation(mapId,position.x,position.y);
-            const saved=story.saveCheckpoint(id);if(saved){renderGameSaves();$('#save-game-status').textContent='已保存到存档 '+id+'，已记录最后一刻画面与情节。';root.querySelector('[data-slot="'+id+'"]').focus();}else $('#save-game-status').textContent='保存失败，浏览器未能写入本地存储，请重试。';
+
+function renderChapterEnvironment() {
+    const s = story.state;
+    if (mapId === 'B02' && s.chapter >= 2) {
+        ctx.save();
+        if (!s.flags.culture_power) {
+            ctx.fillStyle = '#000b';
+            ctx.fillRect(0, 0, 1672, 941);
+        }
+        const count = s.flags.pods_lit || 0;
+        ctx.font = 'bold 22px monospace';
+        ctx.textAlign = 'center';
+        [1180, 1000, 820, 650, 465].forEach((x, i) => {
+            ctx.fillStyle = i < count ? '#ddc886' : '#202b2c';
+            ctx.fillRect(x - 40, 372, 80, 30);
+            if (i < count) {
+                ctx.fillStyle = '#192629';
+                ctx.fillText(String(17 - i), x, 395);
+            }
         });
-        card.append(figure,body,button);root.append(card);
+        ctx.restore();
+    }
+    if (mapId === 'F01' && ['S2', 'S3'].includes(s.family_state)) {
+        ctx.save();
+        const glitch = familyGlitchImages.stage2;
+        if (glitch.complete && glitch.naturalWidth) ctx.drawImage(glitch, 0, 0, MAP_SIZE.width, MAP_SIZE.height);
+        ctx.restore();
+    }
+    if (mapId === 'R06' && s.flags.reply_queued) {
+        ctx.save();
+        ctx.fillStyle = '#d6b557';
+        ctx.beginPath();
+        ctx.arc(910, 340, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = '18px sans-serif';
+        ctx.fillText('地球待确认', 930, 348);
+        ctx.restore();
+    }
+    if (mapId === 'R05' && s.node === 'M03_SEE' && walkSheet) {
+        const size = getCharacterDrawSize(mapId);
+        ctx.save();
+        ctx.globalAlpha = .28;
+        ctx.drawImage(walkSheet, 0, 4 * 256, 256, 256, 1000 - size.width / 2, 490 - size.height * 244 / 256, size.width, size.height);
+        ctx.restore();
+    }
+}
+
+function restorePuzzleFullscreen() {
+    const screen = $('#minigame');
+    if (!document.fullscreenElement && screen.requestFullscreen) screen.requestFullscreen().then(() => {
+        puzzles.ownsFullscreen = true;
+        if (activeOverlay !== 'minigame') puzzles.leaveFullscreen();
+    }).catch(() => {
+    });
+}
+
+function renderGameSaves() {
+    overwriteSlot = null;
+    $('#save-game-status').textContent = '';
+    $('#save-game-note').textContent = story.busy ? '本段对话尚未结束。保存已确认的进度，读档后从本段开始。' : puzzles.running ? '保存当前任务与证据；读档后，本次小游戏从头开始。' : '保存当前所在位置、任务、证据与选择，并保留保存前的最后一刻画面与对应情节。';
+    const root = $('#game-save-slots');
+    root.replaceChildren();
+    MoonStorage.listSlots().forEach(({id, data}) => {
+        const card = document.createElement('article');
+        card.className = 'game-save-slot' + (data ? '' : ' is-empty');
+        const figure = MoonSaveThumbnail.create(data, 'game-save-slot__thumb', {
+            placeholder: 'NO FRAME',
+            label: '存档 ' + id + ' 的最后一刻画面'
+        });
+        const body = document.createElement('div');
+        body.className = 'game-save-slot__body';
+        const heading = document.createElement('div');
+        heading.className = 'game-save-slot__heading';
+        const label = document.createElement('strong');
+        label.textContent = '存档 ' + String(id).padStart(2, '0');
+        const chapter = document.createElement('small');
+        chapter.textContent = data ? (data.chapterTitle || ('第 ' + (data.chapter || 0) + ' 章')) : 'EMPTY';
+        heading.append(label, chapter);
+        const plot = document.createElement('b');
+        plot.className = 'game-save-slot__plot';
+        plot.textContent = data ? (data.storyTitle || '未记录情节') : '未检测到任务记录';
+        const summary = document.createElement('p');
+        summary.className = 'game-save-slot__summary';
+        summary.textContent = data ? (data.storySummary || '任务正在进行，已保存当前探索位置与状态。') : '空白档案槽位。';
+        const detail = document.createElement('p');
+        detail.className = 'game-save-slot__meta';
+        detail.textContent = data ? (data.flags.player_name ? data.flags.player_name + ' · ' : '') + '第 ' + data.chapter + ' 章 · 第 ' + data.day + ' 天 · ' + data.currentMap + ' · ' + new Date(data.savedAt).toLocaleString('zh-CN', {hour12: false}) : 'EMPTY SLOT';
+        body.append(heading, plot, summary, detail);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.slot = id;
+        button.textContent = data ? '覆盖此存档' : '存入此处';
+        button.setAttribute('aria-label', '保存到存档 ' + id);
+        button.addEventListener('click', () => {
+            if (MoonStorage.loadGame(id) && overwriteSlot !== id) {
+                overwriteSlot = id;
+                root.querySelectorAll('button').forEach(b => b.textContent = MoonStorage.loadGame(Number(b.dataset.slot)) ? '覆盖此存档' : '存入此处');
+                button.textContent = '确认覆盖';
+                $('#save-game-status').textContent = '再次点击确认覆盖存档 ' + id + '。';
+                return;
+            }
+            if (!story.busy) story.setLocation(mapId, position.x, position.y);
+            const saved = story.saveCheckpoint(id);
+            if (saved) {
+                renderGameSaves();
+                $('#save-game-status').textContent = '已保存到存档 ' + id + '，已记录最后一刻画面与情节。';
+                root.querySelector('[data-slot="' + id + '"]').focus();
+            } else $('#save-game-status').textContent = '保存失败，浏览器未能写入本地存储，请重试。';
+        });
+        card.append(figure, body, button);
+        root.append(card);
     });
 }

@@ -92,6 +92,9 @@
     });
 
     const initialRoute = readRoute();
-    navigate(initialRoute, {replace: true, search: location.hash.includes("?") ? "?" + location.hash.split("?")[1] : ""});
+    navigate(initialRoute, {
+        replace: true,
+        search: location.hash.includes("?") ? "?" + location.hash.split("?")[1] : ""
+    });
     window.MoonMenuShell = Object.freeze({navigate});
 }());

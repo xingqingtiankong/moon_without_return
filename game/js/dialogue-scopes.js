@@ -11,6 +11,7 @@
         "chapter3:S05": ["V_REPLY_SENT", "V_REPLY_DRAFT"]
     };
     const branches = new Map(Object.entries(branchGroups).flatMap(([scope, ids]) => ids.map(id => [id, scope])));
+
     function forEvent(eventId) {
         const id = String(eventId || "").replace(/^(campaign_|v5_choice_)/, "");
         if (branches.has(id)) return branches.get(id);
@@ -27,5 +28,6 @@
 
         return `event:${id}`;
     }
+
     globalThis.MoonDialogueScopes = Object.freeze({forEvent});
 })();

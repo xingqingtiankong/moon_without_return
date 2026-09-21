@@ -10,7 +10,13 @@
     const DEFAULT_MASTER_VOLUME = 0.4;
     const DEFAULT_MUSIC_VOLUME = 1;
     const DEFAULT_SFX_VOLUME = 1;
-    const DEFAULT_DISPLAY = Object.freeze({scale: 1, brightness: 1, scanlines: true, grain: true, reducedMotion: false});
+    const DEFAULT_DISPLAY = Object.freeze({
+        scale: 1,
+        brightness: 1,
+        scanlines: true,
+        grain: true,
+        reducedMotion: false
+    });
 
     const DEFAULT_BINDINGS = Object.freeze({
         exploration: Object.freeze({
@@ -64,7 +70,19 @@
         const masterVolume = Number.isFinite(parsed.masterVolume) ? Math.max(0, Math.min(1, parsed.masterVolume)) : DEFAULT_MASTER_VOLUME;
         const musicVolume = Number.isFinite(parsed.musicVolume) ? Math.max(0, Math.min(1, parsed.musicVolume)) : DEFAULT_MUSIC_VOLUME;
         const sfxVolume = Number.isFinite(parsed.sfxVolume) ? Math.max(0, Math.min(1, parsed.sfxVolume)) : DEFAULT_SFX_VOLUME;
-        return {schemaVersion: SETTINGS_VERSION, bindings: clone(parsed.bindings), difficulty: ["easy", "normal", "hard"].includes(parsed.difficulty) ? parsed.difficulty : "normal", masterVolume, musicVolume, sfxVolume, scale: Number.isFinite(parsed.scale) ? Math.max(.85, Math.min(1.15, parsed.scale)) : 1, brightness: Number.isFinite(parsed.brightness) ? Math.max(.7, Math.min(1.3, parsed.brightness)) : 1, scanlines: parsed.scanlines !== false, grain: parsed.grain !== false, reducedMotion: parsed.reducedMotion === true};
+        return {
+            schemaVersion: SETTINGS_VERSION,
+            bindings: clone(parsed.bindings),
+            difficulty: ["easy", "normal", "hard"].includes(parsed.difficulty) ? parsed.difficulty : "normal",
+            masterVolume,
+            musicVolume,
+            sfxVolume,
+            scale: Number.isFinite(parsed.scale) ? Math.max(.85, Math.min(1.15, parsed.scale)) : 1,
+            brightness: Number.isFinite(parsed.brightness) ? Math.max(.7, Math.min(1.3, parsed.brightness)) : 1,
+            scanlines: parsed.scanlines !== false,
+            grain: parsed.grain !== false,
+            reducedMotion: parsed.reducedMotion === true
+        };
     }
 
     function saveSettings(settings) {
@@ -78,7 +96,9 @@
             sfxVolume: Number.isFinite(settings.sfxVolume) ? Math.max(0, Math.min(1, settings.sfxVolume)) : DEFAULT_SFX_VOLUME,
             scale: Number.isFinite(settings.scale) ? Math.max(.85, Math.min(1.15, settings.scale)) : 1,
             brightness: Number.isFinite(settings.brightness) ? Math.max(.7, Math.min(1.3, settings.brightness)) : 1,
-            scanlines: settings.scanlines !== false, grain: settings.grain !== false, reducedMotion: settings.reducedMotion === true
+            scanlines: settings.scanlines !== false,
+            grain: settings.grain !== false,
+            reducedMotion: settings.reducedMotion === true
         };
         try {
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(clean));
@@ -91,7 +111,14 @@
     }
 
     function resetSettings() {
-        const settings = {schemaVersion: SETTINGS_VERSION, bindings: clone(DEFAULT_BINDINGS), difficulty: "normal", masterVolume: DEFAULT_MASTER_VOLUME, musicVolume: DEFAULT_MUSIC_VOLUME, sfxVolume: DEFAULT_SFX_VOLUME, ...clone(DEFAULT_DISPLAY)};
+        const settings = {
+            schemaVersion: SETTINGS_VERSION,
+            bindings: clone(DEFAULT_BINDINGS),
+            difficulty: "normal",
+            masterVolume: DEFAULT_MASTER_VOLUME,
+            musicVolume: DEFAULT_MUSIC_VOLUME,
+            sfxVolume: DEFAULT_SFX_VOLUME, ...clone(DEFAULT_DISPLAY)
+        };
         settings.difficulty = loadSettings().difficulty;
         saveSettings(settings);
         return settings;

@@ -2,8 +2,8 @@
 
 (function createChapter1Data() {
     const portraits = {
-        azhi: "../img/characters/azhi/azhi-portrait.png",
-        xing8: "../img/characters/xing8/xing8-portrait.png"
+        azhi: "../img/characters/azhi/expressions/smile.png",
+        xing8: "../img/characters/xing8/expressions/smile.png"
     };
     const actors = {
         azhi: {name: "阿芷", role: "妻子", portrait: portraits.azhi, mapImage: "../img/characters/azhi/azhi-npc.png"},

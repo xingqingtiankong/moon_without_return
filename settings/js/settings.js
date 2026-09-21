@@ -81,7 +81,10 @@ function handleCapture(event) {
         return;
     }
     const code = event.code;
-    if(capturing.context==='minigame'&&code==='KeyR'){feedback.textContent='R 用于重新挑战小游戏，请选择其他按键。';return;}
+    if (capturing.context === 'minigame' && code === 'KeyR') {
+        feedback.textContent = 'R 用于重新挑战小游戏，请选择其他按键。';
+        return;
+    }
     const conflict = MoonStorage.findConflict(settings.bindings, capturing.context, capturing.action, code);
     if (conflict) {
         feedback.textContent = `冲突：${MoonStorage.keyLabel(code)} 已用于“${MoonStorage.ACTION_LABELS[conflict]}”。未保存。`;
@@ -157,7 +160,10 @@ displayControls.forEach(input => input.addEventListener("input", () => {
     settings[key] = input.type === "checkbox" ? input.checked : Number(input.value) / 100;
     MoonStorage.saveSettings(settings);
     renderDisplay();
-    if (returnToGame && window.parent !== window.self) window.parent.postMessage({type: "moon-settings-changed", detail: settings}, "*");
+    if (returnToGame && window.parent !== window.self) window.parent.postMessage({
+        type: "moon-settings-changed",
+        detail: settings
+    }, "*");
 }));
 
 volumeControls.forEach(({input, key}) => input.addEventListener("input", () => {
@@ -181,7 +187,6 @@ volumeControls.forEach(({input, key}) => input.addEventListener("input", () => {
 }));
 
 
-
 function initialize() {
     document.body.dataset.settingsState = "ready";
     document.body.classList.toggle("is-embedded", window.parent !== window.self);
@@ -200,8 +205,18 @@ function initialize() {
     });
 }
 
-function renderDifficulty(){document.querySelectorAll('[data-difficulty]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.difficulty===settings.difficulty));}
-document.querySelectorAll('[data-difficulty]').forEach(button=>button.addEventListener('click',()=>{settings.difficulty=button.dataset.difficulty;if(!MoonStorage.saveSettings(settings)){settings=MoonStorage.loadSettings();feedback.textContent='难度未能保存，请检查浏览器存储权限。';}renderDifficulty();}));
+function renderDifficulty() {
+    document.querySelectorAll('[data-difficulty]').forEach(button => button.setAttribute('aria-pressed', button.dataset.difficulty === settings.difficulty));
+}
+
+document.querySelectorAll('[data-difficulty]').forEach(button => button.addEventListener('click', () => {
+    settings.difficulty = button.dataset.difficulty;
+    if (!MoonStorage.saveSettings(settings)) {
+        settings = MoonStorage.loadSettings();
+        feedback.textContent = '难度未能保存，请检查浏览器存储权限。';
+    }
+    renderDifficulty();
+}));
 renderDifficulty();
 renderVolumes();
 renderDisplay();

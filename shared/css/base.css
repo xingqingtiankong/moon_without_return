@@ -1,7 +1,4 @@
 
-
-
-
 :root {
     --display-scale: 1;
     --display-brightness: 1;
@@ -88,9 +85,6 @@ body.is-leaving .page-shell {
     opacity: 0;
     filter: blur(1.5px);
 }
-
-
-
 
 
 .scene-background {
@@ -180,9 +174,6 @@ body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::aft
 }
 
 
-
-
-
 .game-mark {
     display: block;
     width: clamp(14rem, 21vw, 24rem);
@@ -231,9 +222,6 @@ body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::aft
 .corner-hud__value {
     color: rgba(181, 204, 202, 0.58);
 }
-
-
-
 
 
 .inner-header {
@@ -339,9 +327,6 @@ body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::aft
     color: rgba(226, 235, 233, 0.96);
     text-shadow: 0 0 0.75rem rgba(158, 207, 209, 0.24);
 }
-
-
-
 
 
 @keyframes pageReveal {

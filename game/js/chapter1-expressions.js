@@ -6,12 +6,9 @@
     const normalize = text => String(text || "").replace(/[\p{P}\p{Z}\s]/gu, "");
 
 
-
     function add(node, actor, emotion, lines) {
         for (const text of lines) rules.set([node, actor, normalize(text)].join("|"), emotion);
     }
-
-
 
 
     add("H01", "xing8", "confused", ["我明明都收好了……应该就在家里。"]);
@@ -75,14 +72,13 @@
     add("V_AZHI_DIRECT", "azhi", "angry", [
         "先别叫我的名字", "我记得放在这里的东西，你不能拿一行字替我解释所有事"
     ]);
-    add("H06_INDEX", "azhi", "confused", ["昨天的晚饭在这里", "来源……本地"]);
+    add("H06_INDEX", "azhi", "afraid", ["昨天的晚饭在这里", "来源……本地"]);
     add("H06_INDEX", "azhi", "afraid", ["全是本地……", "可我记得啊？", "先别说！"]);
 
     function resolve(item, state) {
 
 
         if (state?.chapter !== 1 || item?.type !== "line" || !["azhi", "xing8"].includes(item.actor)) return null;
-
 
 
         const emotion = rules.get([state.node, item.actor, normalize(item.text)].join("|")) || "smile";

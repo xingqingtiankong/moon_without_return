@@ -17,10 +17,14 @@
 
         if (new URLSearchParams(location.search).get("return") === "game") {
             window.MoonMenuBgm = Object.freeze({
-                start() {},
-                startPreview() {},
-                stop() {},
-                setVolume() {}
+                start() {
+                },
+                startPreview() {
+                },
+                stop() {
+                },
+                setVolume() {
+                }
             });
             return;
         }
@@ -54,10 +58,14 @@
 
         if (route && !settingsReturnToGame) {
             window.MoonMenuBgm = Object.freeze({
-                start() {},
-                startPreview() {},
-                stop() {},
-                setVolume() {}
+                start() {
+                },
+                startPreview() {
+                },
+                stop() {
+                },
+                setVolume() {
+                }
             });
             location.replace(`../menu/index.html#/${route}`);
             return;
@@ -66,9 +74,12 @@
 
     if (!audio) {
         window.MoonMenuBgm = Object.freeze({
-            start() {},
-            stop() {},
-            setVolume() {}
+            start() {
+            },
+            stop() {
+            },
+            setVolume() {
+            }
         });
         return;
     }
@@ -81,12 +92,11 @@
     let previewStarted = false;
 
 
-
-
     function restartWhenEnded() {
         if (stopped || (previewOnly && !previewStarted)) return;
         audio.currentTime = 0;
-        audio.play().catch(() => {});
+        audio.play().catch(() => {
+        });
     }
 
     function getSettings() {
@@ -141,7 +151,8 @@
                 }
             }
 
-            audio.play().catch(() => {});
+            audio.play().catch(() => {
+            });
         }
     }
 
